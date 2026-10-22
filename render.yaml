@@ -1,0 +1,16 @@
+# One free web service: Express serves the API and the built React app.
+services:
+  - type: web
+    name: teach-me-this-file
+    runtime: node
+    plan: free
+    # Dev dependencies are needed to build the client with Vite.
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: '22'
+      # Optional: a host key used when the browser sends none. Set it in the dashboard.
+      - key: GEMINI_API_KEY
+        sync: false
