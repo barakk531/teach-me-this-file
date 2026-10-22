@@ -1,5 +1,17 @@
 // Read-only views of the lesson state, used by the UI and to build AI requests.
 
+// A step the student needed this many tries for is worth reviewing.
+const REVIEW_AFTER_TRIES = 3;
+
+/** Tries on a step: each weak answer plus the one that succeeded. */
+export function triesOn(progress, stepIndex) {
+  return progress.attempts[stepIndex] + 1;
+}
+
+export function needsReview(progress, stepIndex) {
+  return triesOn(progress, stepIndex) >= REVIEW_AFTER_TRIES;
+}
+
 export function isStreaming(lesson) {
   return lesson.messages.at(-1)?.status === 'streaming';
 }

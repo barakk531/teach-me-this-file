@@ -1,1 +1,148 @@
 @import 'tailwindcss';
+
+/* An exercise book: ruled paper, ballpoint ink, a highlighter for sources. */
+@theme {
+  --font-sans:
+    'Atkinson Hyperlegible Next', 'Noto Sans Hebrew', 'Noto Sans Arabic', system-ui, sans-serif;
+
+  --color-paper: #fbfcfe;
+  --color-grid: #e7ecf5;
+  --color-line: #d6deea;
+  --color-ink: #18233d;
+  --color-muted: #5b6680;
+  --color-pen: #2445b8;
+  --color-pen-dark: #1a3391;
+  --color-pen-soft: #e9eefb;
+  --color-marker: #ffe873;
+  --color-tick: #1f8a5b;
+  --color-danger: #b42318;
+  --color-danger-soft: #fdeeec;
+
+  --animate-caret: caret 1s steps(2) infinite;
+  --animate-highlight: highlight 0.5s ease-out both;
+
+  @keyframes caret {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes highlight {
+    from {
+      background-size: 0% 100%;
+    }
+    to {
+      background-size: 100% 100%;
+    }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-paper font-sans text-ink antialiased;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-pen;
+  }
+  ::selection {
+    @apply bg-marker;
+  }
+}
+
+@utility ruled-paper {
+  background-image:
+    linear-gradient(var(--color-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* A highlighter stroke: slightly uneven edges, and it sweeps in when shown. */
+@utility marker {
+  background-image: linear-gradient(
+    100deg,
+    transparent 0.4em,
+    color-mix(in srgb, var(--color-marker) 85%, transparent) 0.6em,
+    var(--color-marker) 96%,
+    transparent
+  );
+  background-repeat: no-repeat;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  padding: 0.05em 0.35em;
+  margin: 0 -0.2em;
+}
+
+/* A whole passage from the file, marked like a highlighted paragraph. */
+.passage {
+  background-image: linear-gradient(
+    color-mix(in srgb, var(--color-marker) 70%, transparent),
+    color-mix(in srgb, var(--color-marker) 70%, transparent)
+  );
+  background-repeat: no-repeat;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Text written by the tutor or copied from the file (Markdown + math). */
+.lesson-text {
+  overflow-wrap: anywhere;
+}
+.lesson-text > * + * {
+  margin-top: 0.7em;
+}
+.lesson-text strong {
+  font-weight: 700;
+}
+.lesson-text ul,
+.lesson-text ol {
+  padding-inline-start: 1.3em;
+}
+.lesson-text ul {
+  list-style: disc;
+}
+.lesson-text ol {
+  list-style: decimal;
+}
+.lesson-text li + li {
+  margin-top: 0.25em;
+}
+.lesson-text code {
+  @apply rounded bg-pen-soft px-1 text-[0.92em];
+}
+.lesson-text table {
+  @apply block max-w-full overflow-x-auto border-collapse text-[0.92em];
+}
+.lesson-text th,
+.lesson-text td {
+  @apply border border-line px-2 py-1 text-start align-top;
+}
+.lesson-text th {
+  @apply bg-pen-soft font-bold;
+}
+.lesson-text blockquote {
+  @apply border-s-4 border-line ps-3 text-muted;
+}
+/* Formulas always read left to right, even inside Hebrew or Arabic text. */
+.lesson-text .katex {
+  direction: ltr;
+  unicode-bidi: isolate;
+  font-size: 1.05em;
+}
+.lesson-text .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.2em 0;
+}
