@@ -37,6 +37,8 @@ GEMINI_API_KEY=your-key
 # GEMINI_MODELS=gemini-3.6-flash,gemini-3.8-flash,gemini-3.5-flash-lite
 ```
 
+Leave `GEMINI_API_KEY` unset on a public deployment: anyone who opens the app could spend that key's quota. The live app expects each user to bring their own key.
+
 | Command         | What it does                                                        |
 | --------------- | ------------------------------------------------------------------- |
 | `npm run dev`   | Client (Vite, hot reload) and server (Node, restarts on change)     |

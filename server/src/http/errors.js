@@ -22,6 +22,13 @@ export function redactSecrets(text) {
 export function toAppError(err) {
   if (err instanceof AppError) return err;
   if (err?.name === 'AbortError') return new AppError('aborted', 'The request was cancelled.');
+  // Errors from express.json(): the client's fault, not a server failure.
+  if (err?.type === 'entity.too.large') {
+    return new AppError('request_too_large', 'The request is too large.', { status: 413 });
+  }
+  if (err?.type === 'entity.parse.failed') {
+    return new AppError('invalid_request', 'The request could not be read.');
+  }
   if (err instanceof multer.MulterError) {
     return err.code === 'LIMIT_FILE_SIZE'
       ? new AppError('file_too_large', 'This file is larger than 20 MB. Try a smaller file.', {

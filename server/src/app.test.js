@@ -30,6 +30,24 @@ describe('app', () => {
     expect((await res.json()).error.code).toBe('missing_key');
   });
 
+  it('sends a strict content security policy with every response', async () => {
+    const res = await fetch(`${baseUrl}/api/health`);
+    const policy = res.headers.get('content-security-policy');
+    expect(policy).toContain("img-src 'self' data:");
+    expect(policy).toContain("connect-src 'self'");
+    expect(res.headers.get('x-content-type-options')).toBe('nosniff');
+  });
+
+  it('answers malformed JSON with a 400, not a server error', async () => {
+    const res = await fetch(`${baseUrl}/api/turn`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Gemini-Key': 'test' },
+      body: '{"plan": ',
+    });
+    expect(res.status).toBe(400);
+    expect((await res.json()).error.code).toBe('invalid_request');
+  });
+
   it('answers unknown API routes with a JSON 404', async () => {
     const res = await fetch(`${baseUrl}/api/unknown`, { method: 'POST' });
     expect(res.status).toBe(404);

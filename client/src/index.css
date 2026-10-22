@@ -106,6 +106,9 @@
 .lesson-text strong {
   font-weight: 700;
 }
+.lesson-text a {
+  @apply text-pen underline underline-offset-2;
+}
 .lesson-text ul,
 .lesson-text ol {
   padding-inline-start: 1.3em;

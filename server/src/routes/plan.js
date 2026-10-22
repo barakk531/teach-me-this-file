@@ -9,7 +9,8 @@ import { openEventStream } from '../http/eventStream.js';
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: config.limits.uploadBytes, files: 1 },
+  // One file and one short text field (the prompt); anything else is refused early.
+  limits: { fileSize: config.limits.uploadBytes, files: 1, fields: 2, fieldSize: 16 * 1024 },
 });
 
 export const planRouter = Router();
