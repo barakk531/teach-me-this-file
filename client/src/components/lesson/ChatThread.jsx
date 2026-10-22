@@ -28,7 +28,11 @@ export function ChatThread({ lesson, onShowSources, onRetry, onOpenSettings, onN
   }
 
   return (
-    <div ref={scrollRef} onScroll={handleScroll} className="min-h-0 flex-1 overflow-y-auto">
+    <div
+      ref={scrollRef}
+      onScroll={handleScroll}
+      className="relative min-h-0 flex-1 overflow-y-auto"
+    >
       <div
         role="log"
         aria-label="Lesson chat"

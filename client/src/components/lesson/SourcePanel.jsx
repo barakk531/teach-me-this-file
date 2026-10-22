@@ -38,7 +38,7 @@ export function SourcePanel({ passages, onClose }) {
             <Icon name="close" />
           </button>
         </div>
-        <div className="space-y-5 overflow-y-auto px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="relative space-y-5 overflow-y-auto px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
           {passages.map((passage) => (
             <figure key={passage.id}>
               <figcaption className="mb-1.5 text-sm font-medium text-muted">

@@ -34,7 +34,7 @@ export function LessonScreen({ lesson, dispatch, apiKey, hasKey, onOpenSettings 
       {stepsOpen && (
         <div
           id="step-list-mobile"
-          className="max-h-[50dvh] shrink-0 overflow-y-auto border-b border-line bg-white px-2 py-2 lg:hidden"
+          className="relative max-h-[50dvh] shrink-0 overflow-y-auto border-b border-line bg-white px-2 py-2 lg:hidden"
         >
           <StepList lesson={lesson} />
         </div>
@@ -43,7 +43,7 @@ export function LessonScreen({ lesson, dispatch, apiKey, hasKey, onOpenSettings 
       <div className="flex min-h-0 flex-1">
         <aside
           aria-label="Lesson steps"
-          className="hidden w-72 shrink-0 overflow-y-auto border-e border-line bg-white px-3 py-4 lg:block"
+          className="relative hidden w-72 shrink-0 overflow-y-auto border-e border-line bg-white px-3 py-4 lg:block"
         >
           <StepList lesson={lesson} />
           {lesson.plan.scope && (
@@ -58,7 +58,7 @@ export function LessonScreen({ lesson, dispatch, apiKey, hasKey, onOpenSettings 
 
         <main className="flex min-w-0 flex-1 flex-col">
           {lesson.status === 'ready' ? (
-            <div className="min-h-0 flex-1 overflow-y-auto">
+            <div className="relative min-h-0 flex-1 overflow-y-auto">
               <PlanOverview lesson={lesson} onStart={tutor.start} />
             </div>
           ) : (
