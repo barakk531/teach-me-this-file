@@ -42,19 +42,17 @@ async function repeat(scenario, runner) {
   for (let run = 1; run <= runs; run++) {
     process.stdout.write(`${scenario.id} (run ${run}/${runs})… `);
     let outcome;
-    let verdict;
+    let status;
     try {
       outcome = await runner(scenario);
-      verdict = outcome.problems.length === 0 ? 'PASS' : 'FAIL';
+      status = outcome.problems.length === 0 ? 'PASS' : 'FAIL';
     } catch (err) {
       // The AI could not be reached (overload, quota): no verdict on its behaviour.
       outcome = { problems: [`${err.code ?? 'error'}: ${err.message}`], transcript: [] };
-      verdict = 'ERROR';
+      status = 'ERROR';
     }
-    console.log(
-      verdict === 'PASS' ? verdict : `${verdict}\n   - ${outcome.problems.join('\n   - ')}`,
-    );
-    results.push({ scenario, run, verdict, ...outcome });
+    console.log(status === 'PASS' ? status : `${status}\n   - ${outcome.problems.join('\n   - ')}`);
+    results.push({ scenario, run, status, ...outcome });
   }
 }
 
@@ -160,13 +158,13 @@ function pause() {
 }
 
 async function report(all) {
-  const count = (verdict) => all.filter((r) => r.verdict === verdict).length;
+  const count = (status) => all.filter((r) => r.status === status).length;
   const summary = `${count('PASS')} passed, ${count('FAIL')} failed, ${count('ERROR')} could not run (AI unavailable)`;
   console.log(`\n${summary}`);
   const ids = [...new Set(all.map((r) => r.scenario.id))];
   for (const id of ids) {
     const runsOf = all.filter((r) => r.scenario.id === id);
-    console.log(`  ${id}: ${runsOf.filter((r) => r.verdict === 'PASS').length}/${runsOf.length}`);
+    console.log(`  ${id}: ${runsOf.filter((r) => r.status === 'PASS').length}/${runsOf.length}`);
   }
 
   const lines = [
@@ -178,7 +176,7 @@ async function report(all) {
     '',
   ];
   for (const r of all) {
-    lines.push(`## ${r.verdict}: ${r.scenario.title} (\`${r.scenario.id}\`, run ${r.run})`, '');
+    lines.push(`## ${r.status}: ${r.scenario.title} (\`${r.scenario.id}\`, run ${r.run})`, '');
     r.problems.forEach((p) => lines.push(`- ${p}`));
     if (r.note) lines.push(r.note);
     if (r.verdict) lines.push(`Judge: ${r.verdict.reason}`);
