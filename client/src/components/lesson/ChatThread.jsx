@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { LessonComplete } from './LessonComplete.jsx';
 import { TutorMessage } from './TutorMessage.jsx';
 
@@ -9,18 +9,19 @@ export function ChatThread({ lesson, onShowSources, onRetry, onOpenSettings, onN
   const scrollRef = useRef(null);
   const stickToBottom = useRef(true);
   const { messages, plan } = lesson;
-  const lastText = messages.at(-1)?.text;
+  const lastStudentId = messages.findLast((m) => m.role === 'student')?.id;
+  const seenStudentId = useRef(lastStudentId);
 
-  // Follow the streaming reply, unless the student scrolled up to read.
+  // Follow the reply while it streams and when it ends (sources, errors), unless the
+  // student scrolled up to read. A new message from the student always brings it back.
   useLayoutEffect(() => {
+    if (lastStudentId !== seenStudentId.current) {
+      seenStudentId.current = lastStudentId;
+      stickToBottom.current = true;
+    }
     const el = scrollRef.current;
     if (stickToBottom.current) el.scrollTop = el.scrollHeight;
-  }, [messages.length, lastText, lesson.status]);
-
-  // A new message from the student always brings the view back down.
-  useEffect(() => {
-    if (messages.at(-1)?.role === 'student') stickToBottom.current = true;
-  }, [messages]);
+  }, [messages, lastStudentId, lesson.status]);
 
   function handleScroll() {
     const el = scrollRef.current;
@@ -28,11 +29,7 @@ export function ChatThread({ lesson, onShowSources, onRetry, onOpenSettings, onN
   }
 
   return (
-    <div
-      ref={scrollRef}
-      onScroll={handleScroll}
-      className="relative min-h-0 flex-1 overflow-y-auto"
-    >
+    <div ref={scrollRef} onScroll={handleScroll} className="min-h-0 flex-1 overflow-y-auto">
       <div
         role="log"
         aria-label="Lesson chat"
@@ -51,11 +48,12 @@ export function ChatThread({ lesson, onShowSources, onRetry, onOpenSettings, onN
             />
           ) : (
             <div key={message.id} className="flex justify-end">
+              {/* Outside the bubble, so its English letters do not set the bubble's direction. */}
+              <span className="sr-only">You:</span>
               <p
                 dir="auto"
                 className="max-w-[85%] rounded-2xl rounded-ee-md bg-pen-soft px-4 py-2.5 text-[17px] leading-relaxed whitespace-pre-wrap"
               >
-                <span className="sr-only">You: </span>
                 {message.text}
               </p>
             </div>

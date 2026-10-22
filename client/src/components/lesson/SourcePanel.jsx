@@ -6,12 +6,19 @@ import { Icon } from '../ui/Icon.jsx';
 export function SourcePanel({ passages, onClose }) {
   const closeRef = useRef(null);
 
+  // Focus moves into the panel, and back to the "Source" button when it closes.
   useEffect(() => {
+    const opener = document.activeElement;
     closeRef.current.focus();
-    const onKey = (e) => e.key === 'Escape' && onClose();
+    return () => opener?.focus?.();
+  }, []);
+
+  useEffect(() => {
+    // Escape inside another dialog (Settings) belongs to that dialog.
+    const onKey = (e) => e.key === 'Escape' && !e.target.closest?.('dialog') && onClose();
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [passages, onClose]);
+  }, [onClose]);
 
   return (
     <>
@@ -38,7 +45,7 @@ export function SourcePanel({ passages, onClose }) {
             <Icon name="close" />
           </button>
         </div>
-        <div className="relative space-y-5 overflow-y-auto px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="space-y-5 overflow-y-auto px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
           {passages.map((passage) => (
             <figure key={passage.id}>
               <figcaption className="mb-1.5 text-sm font-medium text-muted">
