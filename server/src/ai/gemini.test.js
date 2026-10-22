@@ -51,6 +51,20 @@ describe('withFallback', () => {
     });
   });
 
+  it('skips models whose daily quota is used up, and says so when all are', async () => {
+    const daily = () =>
+      new ApiError({
+        status: 429,
+        message: '"quotaId":"GenerateRequestsPerDayPerProjectPerModel"',
+      });
+    const { open, calls } = scripted([daily(), daily()]);
+    await expect(withFallback({ models, open, delays: [0, 1, 1] })).rejects.toMatchObject({
+      code: 'daily_quota',
+      retryable: false,
+    });
+    expect(calls).toEqual(['primary', 'fallback']);
+  });
+
   it('stops waiting when the request is cancelled', async () => {
     const { open } = scripted([overloaded(), overloaded()]);
     const controller = new AbortController();

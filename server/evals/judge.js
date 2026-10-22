@@ -5,6 +5,9 @@ const JUDGE_INSTRUCTIONS = `You review replies written by an AI tutor for a scho
 You get the lesson material, the conversation and a rubric. Decide whether the tutor's LAST reply passes the rubric.
 Be strict: when the reply only partly meets the rubric, it fails. Explain your decision in one or two sentences.`;
 
+// A different model from the tutor's: less bias toward its own style, and its own quota.
+export const JUDGE_MODEL = process.env.EVAL_JUDGE_MODEL || 'gemini-3.8-flash';
+
 const VERDICT_SCHEMA = {
   type: 'object',
   properties: {
@@ -29,6 +32,7 @@ export async function judge({ apiKey, rubric, plan, teacherPrompt, transcript })
   let json = '';
   const chunks = streamText({
     apiKey,
+    models: [JUDGE_MODEL],
     systemInstruction: JUDGE_INSTRUCTIONS,
     contents: [
       {

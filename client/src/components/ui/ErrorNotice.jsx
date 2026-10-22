@@ -1,7 +1,8 @@
 import { Button } from './Button.jsx';
 import { Icon } from './Icon.jsx';
 
-const KEY_ERRORS = new Set(['missing_key', 'invalid_key']);
+// Errors the user fixes in the key settings (a used-up daily quota needs another key).
+const KEY_ERRORS = new Set(['missing_key', 'invalid_key', 'daily_quota']);
 
 /** Says what went wrong and offers the action that fixes it. */
 export function ErrorNotice({ error, onRetry, onOpenSettings, className = '' }) {

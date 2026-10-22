@@ -33,8 +33,8 @@ Optionally, create a `.env` file at the project root to give the server its own 
 
 ```bash
 GEMINI_API_KEY=your-key
-# GEMINI_MODEL=gemini-3.8-flash
-# GEMINI_FALLBACK_MODEL=gemini-3.6-flash
+# Models tried in order (each has its own free daily quota)
+# GEMINI_MODELS=gemini-3.6-flash,gemini-3.8-flash,gemini-3.5-flash-lite
 ```
 
 | Command         | What it does                                                        |

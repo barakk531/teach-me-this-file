@@ -1,11 +1,14 @@
 // Behaviour evals against the real Gemini API.
 // Usage: npm run eval [-- tutor|planner] [--runs N] [--only id]
+// Free keys allow about 20 requests per model per day: one full run fits, pin the tutor
+// model with GEMINI_MODELS and the judge with EVAL_JUDGE_MODEL to measure one model.
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { createLessonPlan } from '../src/ai/planner.js';
 import { runTutorTurn } from '../src/ai/tutor.js';
 import { readUpload } from '../src/files/readUpload.js';
-import { judge } from './judge.js';
+import { config } from '../src/config.js';
+import { judge, JUDGE_MODEL } from './judge.js';
 import { plannerScenarios } from './plannerScenarios.js';
 import { tutorScenarios } from './tutorScenarios.js';
 
@@ -166,7 +169,14 @@ async function report(all) {
     console.log(`  ${id}: ${runsOf.filter((r) => r.verdict === 'PASS').length}/${runsOf.length}`);
   }
 
-  const lines = [`# Eval results`, '', `${new Date().toISOString()}: ${summary}`, ''];
+  const lines = [
+    `# Eval results`,
+    '',
+    `${new Date().toISOString()}: ${summary}`,
+    '',
+    `Tutor and planner models: ${config.models.join(' → ')}. Judge: ${JUDGE_MODEL}.`,
+    '',
+  ];
   for (const r of all) {
     lines.push(`## ${r.verdict}: ${r.scenario.title} (\`${r.scenario.id}\`, run ${r.run})`, '');
     r.problems.forEach((p) => lines.push(`- ${p}`));
