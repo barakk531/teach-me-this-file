@@ -85,7 +85,7 @@ function SettingsForm({ saved, serverKey, onClose }) {
           type={visible ? 'text' : 'password'}
           value={key}
           onChange={(e) => setKey(e.target.value)}
-          placeholder="AIza…"
+          placeholder="Paste your key"
           autoComplete="off"
           spellCheck="false"
           className="min-h-11 min-w-0 flex-1 rounded-lg border border-line bg-white px-3 font-mono text-[15px] focus:border-pen focus:outline-none"

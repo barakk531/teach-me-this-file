@@ -11,7 +11,8 @@ export class AppError extends Error {
   }
 }
 
-const GEMINI_KEY_PATTERN = /AIza[0-9A-Za-z_-]{20,}/g;
+// Google issues keys in two formats: the classic "AIza…" and the newer "AQ.…".
+const GEMINI_KEY_PATTERN = /AIza[0-9A-Za-z_-]{20,}|AQ\.[0-9A-Za-z_-]{20,}/g;
 
 /** Errors can echo request details, so keys are removed before anything is logged. */
 export function redactSecrets(text) {
