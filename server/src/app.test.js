@@ -21,6 +21,15 @@ describe('app', () => {
     expect(await res.json()).toEqual({ ok: true, serverKey: false });
   });
 
+  it('asks for an API key before reading an upload', async () => {
+    const body = new FormData();
+    body.append('prompt', 'Teach this to 7th graders.');
+    body.append('file', new Blob(['Water evaporates.']), 'water.txt');
+    const res = await fetch(`${baseUrl}/api/plan`, { method: 'POST', body });
+    expect(res.status).toBe(401);
+    expect((await res.json()).error.code).toBe('missing_key');
+  });
+
   it('answers unknown API routes with a JSON 404', async () => {
     const res = await fetch(`${baseUrl}/api/unknown`, { method: 'POST' });
     expect(res.status).toBe(404);
