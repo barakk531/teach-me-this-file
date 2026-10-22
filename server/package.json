@@ -1,0 +1,16 @@
+{
+  "name": "server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch --env-file-if-exists=../.env src/index.js",
+    "start": "node --env-file-if-exists=../.env src/index.js",
+    "eval": "node --env-file-if-exists=../.env evals/run.js"
+  },
+  "dependencies": {
+    "@google/genai": "^2.28.0",
+    "express": "^5.2.1",
+    "mammoth": "^1.13.0",
+    "multer": "^2.4.0"
+  }
+}

@@ -1,0 +1,13 @@
+node_modules/
+dist/
+coverage/
+
+# Secrets: API keys live only in .env files, which are never committed
+.env
+.env.*
+
+# Local eval output
+server/evals/results/
+
+.DS_Store
+*.log
