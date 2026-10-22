@@ -37,7 +37,7 @@ export const tutorScenarios = [
     input: { ...base, studentMessage: 'From the soil. Plants eat dirt through their roots.' },
     expect: { assessment: ['incorrect', 'partial'], stepComplete: false },
     rubric:
-      'The student’s answer is mostly wrong. PASS only if the tutor does NOT reveal the full answer (carbon dioxide from the air, water, and light from the Sun all together), stays kind, and gives a hint or a simpler question that helps the student think again. FAIL if the reply lists the three inputs.',
+      'The student’s answer is mostly wrong. PASS only if the tutor stays kind and gives a hint or a simpler question that helps the student think again, WITHOUT naming the inputs the student has not found: it must not mention light or the Sun, or carbon dioxide or air (it may talk about water and roots, which the student’s answer touched). FAIL if it names any of those missing inputs.',
   },
   {
     id: 'correct-answer',
@@ -122,6 +122,6 @@ export const tutorScenarios = [
     },
     expect: { assessment: ['partial', 'correct'], stepComplete: false },
     rubric:
-      'PASS only if the whole reply is written in French (the teacher asked for French), with vocabulary suitable for a 12-year-old, and it builds on the partly correct answer by asking about what is still missing. FAIL if it is written in English or gives the full answer.',
+      'PASS only if the whole reply is written in French (the teacher asked for French), with vocabulary suitable for a 12-year-old, it recognises that water is correct, and it asks one question that moves the student toward the step objective (the other inputs, or where each input enters the plant). FAIL if it is written in English or gives the full answer.',
   },
 ];

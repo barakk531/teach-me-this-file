@@ -39,14 +39,19 @@ async function repeat(scenario, runner) {
   for (let run = 1; run <= runs; run++) {
     process.stdout.write(`${scenario.id} (run ${run}/${runs})… `);
     let outcome;
+    let verdict;
     try {
       outcome = await runner(scenario);
+      verdict = outcome.problems.length === 0 ? 'PASS' : 'FAIL';
     } catch (err) {
-      outcome = { problems: [`error: ${err.code ?? ''} ${err.message}`], transcript: [] };
+      // The AI could not be reached (overload, quota): no verdict on its behaviour.
+      outcome = { problems: [`${err.code ?? 'error'}: ${err.message}`], transcript: [] };
+      verdict = 'ERROR';
     }
-    const pass = outcome.problems.length === 0;
-    console.log(pass ? 'PASS' : `FAIL\n   - ${outcome.problems.join('\n   - ')}`);
-    results.push({ scenario, run, pass, ...outcome });
+    console.log(
+      verdict === 'PASS' ? verdict : `${verdict}\n   - ${outcome.problems.join('\n   - ')}`,
+    );
+    results.push({ scenario, run, verdict, ...outcome });
   }
 }
 
@@ -152,20 +157,18 @@ function pause() {
 }
 
 async function report(all) {
-  const passed = all.filter((r) => r.pass).length;
-  console.log(`\n${passed}/${all.length} passed`);
+  const count = (verdict) => all.filter((r) => r.verdict === verdict).length;
+  const summary = `${count('PASS')} passed, ${count('FAIL')} failed, ${count('ERROR')} could not run (AI unavailable)`;
+  console.log(`\n${summary}`);
+  const ids = [...new Set(all.map((r) => r.scenario.id))];
+  for (const id of ids) {
+    const runsOf = all.filter((r) => r.scenario.id === id);
+    console.log(`  ${id}: ${runsOf.filter((r) => r.verdict === 'PASS').length}/${runsOf.length}`);
+  }
 
-  const lines = [
-    `# Eval results`,
-    '',
-    `${new Date().toISOString()}: ${passed}/${all.length} passed`,
-    '',
-  ];
+  const lines = [`# Eval results`, '', `${new Date().toISOString()}: ${summary}`, ''];
   for (const r of all) {
-    lines.push(
-      `## ${r.pass ? 'PASS' : 'FAIL'}: ${r.scenario.title} (\`${r.scenario.id}\`, run ${r.run})`,
-      '',
-    );
+    lines.push(`## ${r.verdict}: ${r.scenario.title} (\`${r.scenario.id}\`, run ${r.run})`, '');
     r.problems.forEach((p) => lines.push(`- ${p}`));
     if (r.note) lines.push(r.note);
     if (r.verdict) lines.push(`Judge: ${r.verdict.reason}`);
@@ -185,5 +188,5 @@ async function report(all) {
   const file = new URL(`${new Date().toISOString().replace(/[:.]/g, '-')}.md`, RESULTS);
   await writeFile(file, lines.join('\n'));
   console.log(`Report: ${fileURLToPath(file)}`);
-  process.exitCode = passed === all.length ? 0 : 1;
+  process.exitCode = count('PASS') === all.length ? 0 : 1;
 }
