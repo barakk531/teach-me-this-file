@@ -50,8 +50,8 @@ export function SetupScreen({ apiKey, hasKey, server, onOpenSettings, onPlanned 
           <span className="marker animate-highlight">Turn a file into a lesson.</span>
         </h1>
         <p className="mt-4 max-w-xl text-lg text-muted">
-          Upload the material and say how to teach it. A tutor then teaches it in a chat, one
-          step at a time, checking understanding as it goes.
+          Upload the material and say how to teach it. A tutor then teaches it in a chat, one step
+          at a time, checking understanding as it goes.
         </p>
 
         <form

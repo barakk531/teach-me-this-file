@@ -39,7 +39,10 @@ export function parseTurnRequest(body) {
   if (!Array.isArray(plan?.steps) || !Array.isArray(plan?.passages) || plan.steps.length === 0) {
     throw invalid('The lesson plan is missing.');
   }
-  if (typeof teacherPrompt !== 'string' || teacherPrompt.length > config.limits.teacherPromptChars) {
+  if (
+    typeof teacherPrompt !== 'string' ||
+    teacherPrompt.length > config.limits.teacherPromptChars
+  ) {
     throw invalid('The teacher prompt is missing or too long.');
   }
 

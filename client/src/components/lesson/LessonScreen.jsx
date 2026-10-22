@@ -47,7 +47,10 @@ export function LessonScreen({ lesson, dispatch, apiKey, hasKey, onOpenSettings 
         >
           <StepList lesson={lesson} />
           {lesson.plan.scope && (
-            <p dir={lesson.plan.dir} className="mt-4 border-t border-line px-2 pt-4 text-sm text-muted">
+            <p
+              dir={lesson.plan.dir}
+              className="mt-4 border-t border-line px-2 pt-4 text-sm text-muted"
+            >
               {lesson.plan.scope}
             </p>
           )}

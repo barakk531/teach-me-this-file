@@ -2,7 +2,19 @@ import { useState } from 'react';
 import { Icon } from '../ui/Icon.jsx';
 
 export const MAX_FILE_BYTES = 20 * 1024 * 1024;
-const EXTENSIONS = ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'heic', 'heif', 'docx', 'txt', 'md', 'csv'];
+const EXTENSIONS = [
+  'pdf',
+  'png',
+  'jpg',
+  'jpeg',
+  'webp',
+  'heic',
+  'heif',
+  'docx',
+  'txt',
+  'md',
+  'csv',
+];
 const ACCEPT = EXTENSIONS.map((ext) => `.${ext}`).join(',');
 
 /** Checked again on the server; this only gives faster feedback. */
@@ -71,7 +83,8 @@ export function FilePicker({ file, onChange, error, onError, disabled }) {
         <Icon name="upload" className="size-7 text-pen" />
         <span className="font-medium">
           <span className="hidden sm:inline">
-            Drop a file here, or <span className="text-pen underline underline-offset-2">choose one</span>
+            Drop a file here, or{' '}
+            <span className="text-pen underline underline-offset-2">choose one</span>
           </span>
           <span className="text-pen underline underline-offset-2 sm:hidden">Choose a file</span>
         </span>

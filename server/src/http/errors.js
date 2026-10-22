@@ -57,10 +57,14 @@ function fromGeminiError(err) {
       status: 422,
     });
   }
-  return new AppError('ai_unavailable', 'The AI service is busy right now. Try again in a moment.', {
-    status: 503,
-    retryable: true,
-  });
+  return new AppError(
+    'ai_unavailable',
+    'The AI service is busy right now. Try again in a moment.',
+    {
+      status: 503,
+      retryable: true,
+    },
+  );
 }
 
 function invalidKey() {

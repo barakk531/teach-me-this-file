@@ -15,7 +15,11 @@ export function SourcePanel({ passages, onClose }) {
 
   return (
     <>
-      <div className="fixed inset-0 z-10 bg-ink/30 lg:hidden" onClick={onClose} aria-hidden="true" />
+      <div
+        className="fixed inset-0 z-10 bg-ink/30 lg:hidden"
+        onClick={onClose}
+        aria-hidden="true"
+      />
       <aside
         aria-labelledby="source-title"
         className="fixed inset-x-0 bottom-0 z-20 flex max-h-[75dvh] flex-col rounded-t-2xl border-t border-line bg-white shadow-2xl lg:static lg:z-auto lg:max-h-none lg:w-96 lg:shrink-0 lg:rounded-none lg:border-t-0 lg:border-s lg:shadow-none"

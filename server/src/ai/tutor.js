@@ -8,6 +8,7 @@ const OPENER = '[The student opened the lesson.]';
 /**
  * Runs one tutor turn. Yields `meta` (assessment, step completion, sources)
  * first and then `text` chunks, ready to be streamed to the browser.
+ * The meta event also carries `raw`, the unchecked status line, for evals.
  */
 export async function* runTutorTurn({
   apiKey,
@@ -29,12 +30,20 @@ export async function* runTutorTurn({
     }),
     contents: buildContents(history, studentMessage),
     // Low thinking keeps the first words fast; the plan already did the heavy reasoning.
-    generationConfig: { thinkingConfig: { thinkingLevel: ThinkingLevel.LOW }, maxOutputTokens: 4096 },
+    generationConfig: {
+      thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
+      maxOutputTokens: 4096,
+    },
   });
 
   for await (const event of parseTurn(chunks)) {
     if (event.type === 'meta') {
-      yield { type: 'meta', data: checkMeta(event.meta, plan, progress.stepIndex, studentMessage) };
+      if (!event.meta) console.warn('[tutor] reply had no valid status line; using defaults');
+      yield {
+        type: 'meta',
+        data: checkMeta(event.meta, plan, progress.stepIndex, studentMessage),
+        raw: event.meta,
+      };
     } else {
       yield { type: 'text', data: { text: event.text } };
     }

@@ -44,7 +44,9 @@ export const PLAN_SCHEMA = {
     languageCode: text('BCP 47 code of the lesson language, e.g. "fr" or "he".'),
     audience: text('Who the student is, in a few words, in English, e.g. "7th graders".'),
     durationMinutes: { type: 'integer', description: 'Planned lesson length in minutes.' },
-    scope: text('One or two sentences for the teacher, in the lesson language: what this lesson covers and what was left out.'),
+    scope: text(
+      'One or two sentences for the teacher, in the lesson language: what this lesson covers and what was left out.',
+    ),
     passages: {
       type: 'array',
       items: {

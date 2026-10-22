@@ -29,7 +29,11 @@ export function ChatThread({ lesson, onShowSources, onRetry, onOpenSettings, onN
 
   return (
     <div ref={scrollRef} onScroll={handleScroll} className="min-h-0 flex-1 overflow-y-auto">
-      <div role="log" aria-label="Lesson chat" className="mx-auto max-w-2xl space-y-6 px-4 py-6 sm:px-6">
+      <div
+        role="log"
+        aria-label="Lesson chat"
+        className="mx-auto max-w-2xl space-y-6 px-4 py-6 sm:px-6"
+      >
         {messages.map((message, index) =>
           message.role === 'tutor' ? (
             <TutorMessage
@@ -53,7 +57,9 @@ export function ChatThread({ lesson, onShowSources, onRetry, onOpenSettings, onN
             </div>
           ),
         )}
-        {lesson.status === 'complete' && <LessonComplete lesson={lesson} onNewLesson={onNewLesson} />}
+        {lesson.status === 'complete' && (
+          <LessonComplete lesson={lesson} onNewLesson={onNewLesson} />
+        )}
       </div>
     </div>
   );

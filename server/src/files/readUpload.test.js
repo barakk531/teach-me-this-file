@@ -40,8 +40,8 @@ describe('readUpload', () => {
   });
 
   it('rejects empty files with a clear error', async () => {
-    await expect(readUpload({ buffer: Buffer.from('  \n'), originalname: 'a.txt' })).rejects.toThrow(
-      'This file is empty.',
-    );
+    await expect(
+      readUpload({ buffer: Buffer.from('  \n'), originalname: 'a.txt' }),
+    ).rejects.toThrow('This file is empty.');
   });
 });

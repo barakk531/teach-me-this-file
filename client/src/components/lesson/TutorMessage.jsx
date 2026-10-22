@@ -18,7 +18,11 @@ export function TutorMessage({ message, plan, isLast, onShowSources, onRetry, on
       </span>
       <div className="min-w-0 flex-1 pt-1 text-[17px] leading-relaxed">
         <h3 className="sr-only">Tutor</h3>
-        {text ? <LessonText text={text} dir={plan.dir} /> : status === 'streaming' && <TypingDots />}
+        {text ? (
+          <LessonText text={text} dir={plan.dir} />
+        ) : (
+          status === 'streaming' && <TypingDots />
+        )}
 
         {status === 'error' && (
           <ErrorNotice

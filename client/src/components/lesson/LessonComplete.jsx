@@ -11,7 +11,10 @@ export function LessonComplete({ lesson, onNewLesson }) {
     .filter(({ index }) => needsReview(progress, index));
 
   return (
-    <section className="rounded-2xl border border-tick/30 bg-white p-5 sm:p-6" aria-labelledby="done-title">
+    <section
+      className="rounded-2xl border border-tick/30 bg-white p-5 sm:p-6"
+      aria-labelledby="done-title"
+    >
       <h2 id="done-title" className="flex items-center gap-2.5 text-xl font-bold">
         <span className="grid size-7 place-items-center rounded-full bg-tick text-white">
           <Icon name="check" className="size-4" />
@@ -19,7 +22,8 @@ export function LessonComplete({ lesson, onNewLesson }) {
         Lesson complete
       </h2>
       <p className="mt-2 text-[17px]">
-        All {plan.steps.length} steps done in about {minutes} {minutes === 1 ? 'minute' : 'minutes'}.
+        All {plan.steps.length} steps done in about {minutes} {minutes === 1 ? 'minute' : 'minutes'}
+        .
       </p>
       {toReview.length > 0 && (
         <div className="mt-4">

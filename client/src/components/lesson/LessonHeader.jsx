@@ -2,7 +2,14 @@ import { minutesLeft } from '../../lesson/selectors.js';
 import { KeyButton } from '../KeyButton.jsx';
 import { Icon } from '../ui/Icon.jsx';
 
-export function LessonHeader({ lesson, hasKey, onNewLesson, onOpenSettings, stepsOpen, onToggleSteps }) {
+export function LessonHeader({
+  lesson,
+  hasKey,
+  onNewLesson,
+  onOpenSettings,
+  stepsOpen,
+  onToggleSteps,
+}) {
   const { plan, progress, status } = lesson;
   return (
     <header className="shrink-0 border-b border-line bg-white">

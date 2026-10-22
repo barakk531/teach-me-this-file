@@ -6,7 +6,10 @@ export function PlanOverview({ lesson, onStart }) {
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6">
       <p className="text-[15px] text-muted">
-        Lesson plan for <span dir="auto" className="font-medium text-ink">{fileName}</span>
+        Lesson plan for{' '}
+        <span dir="auto" className="font-medium text-ink">
+          {fileName}
+        </span>
       </p>
       <h2 dir={plan.dir} className="mt-1 text-3xl leading-tight font-bold tracking-tight">
         {plan.title}

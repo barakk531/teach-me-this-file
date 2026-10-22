@@ -40,26 +40,30 @@ export function buildTutorInstructions({ teacherPrompt, plan, progress, isStart 
   return [
     ROLE,
     section('teacher_instructions', teacherPrompt),
+    section('lesson', [
+      `Title: ${plan.title}`,
+      `Teach in: ${plan.language}. Write every message in ${plan.language}.`,
+      plan.audience && `Student: ${plan.audience}`,
+      `Time: about ${plan.durationMinutes} minutes planned, ${minutesElapsed} minutes used so far.`,
+      isStart
+        ? 'The lesson is starting now. Greet the student in one short sentence, say what they will learn, then open step 1 with a question.'
+        : `The lesson is in progress, at step ${stepIndex + 1} of ${plan.steps.length}. Earlier messages may be left out.`,
+    ]),
     section(
-      'lesson',
-      [
-        `Title: ${plan.title}`,
-        `Teach in: ${plan.language}. Write every message in ${plan.language}.`,
-        plan.audience && `Student: ${plan.audience}`,
-        `Time: about ${plan.durationMinutes} minutes planned, ${minutesElapsed} minutes used so far.`,
-        isStart
-          ? 'The lesson is starting now. Greet the student in one short sentence, say what they will learn, then open step 1 with a question.'
-          : `The lesson is in progress, at step ${stepIndex + 1} of ${plan.steps.length}. Earlier messages may be left out.`,
-      ],
+      'plan',
+      plan.steps.map(
+        (s, i) => `${i + 1}. [${stepStatus(i, stepIndex)}] ${s.title}: ${s.objective}`,
+      ),
     ),
-    section('plan', plan.steps.map((s, i) => `${i + 1}. [${stepStatus(i, stepIndex)}] ${s.title}: ${s.objective}`)),
     section('current_step', stepDetails(step, stepIndex, attempts)),
     nextStep
       ? section('next_step', stepDetails(nextStep, stepIndex + 1))
       : 'This is the last step. When it is complete, close the lesson.',
     section(
       'source_passages',
-      plan.passages.map((p) => `<passage id="${p.id}" location="${p.location}">\n${p.text}\n</passage>`),
+      plan.passages.map(
+        (p) => `<passage id="${p.id}" location="${p.location}">\n${p.text}\n</passage>`,
+      ),
     ),
     TEACHING_RULES,
     REPLY_FORMAT,

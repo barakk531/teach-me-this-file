@@ -67,8 +67,8 @@ function SettingsForm({ saved, serverKey, onClose }) {
         >
           Google AI Studio
         </a>
-        . It is sent to our server with each request, used for that request only, and never
-        stored there.
+        . It is sent to our server with each request, used for that request only, and never stored
+        there.
       </p>
       {serverKey && (
         <p className="mt-2 text-[15px] text-muted">
@@ -104,7 +104,9 @@ function SettingsForm({ saved, serverKey, onClose }) {
         />
         <span>
           Remember on this device
-          <span className="block text-muted">Otherwise the key is forgotten when you close this tab.</span>
+          <span className="block text-muted">
+            Otherwise the key is forgotten when you close this tab.
+          </span>
         </span>
       </label>
 

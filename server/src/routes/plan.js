@@ -18,7 +18,8 @@ export const planRouter = Router();
 planRouter.post('/', requireApiKey, upload.single('file'), async (req, res, next) => {
   const teacherPrompt = req.body?.prompt?.trim() ?? '';
   if (!req.file) return next(new AppError('missing_file', 'Choose a file to teach from.'));
-  if (!teacherPrompt) return next(new AppError('missing_prompt', 'Write how the lesson should be taught.'));
+  if (!teacherPrompt)
+    return next(new AppError('missing_prompt', 'Write how the lesson should be taught.'));
   if (teacherPrompt.length > config.limits.teacherPromptChars) {
     return next(new AppError('prompt_too_long', 'The teacher prompt is too long.'));
   }

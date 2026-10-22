@@ -45,8 +45,8 @@ export function PlanningProgress({ fileName, phase, passages, steps, onCancel })
       </ol>
       {seconds > 25 && (
         <p className="mt-5 text-[15px] text-muted">
-          Long or scanned files take longer. The whole file is read once, so the lesson itself
-          will be fast.
+          Long or scanned files take longer. The whole file is read once, so the lesson itself will
+          be fast.
         </p>
       )}
       <Button variant="secondary" className="mt-6" onClick={onCancel}>
