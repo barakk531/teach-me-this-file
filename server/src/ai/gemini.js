@@ -1,7 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 import { setTimeout as wait } from 'node:timers/promises';
 import { config } from '../config.js';
-import { AppError, toAppError } from '../http/errors.js';
+import { AppError, isNetworkError, toAppError } from '../http/errors.js';
 
 // Errors worth trying again: quotas are counted per model, and overload is usually brief.
 const RETRY_CODES = new Set(['rate_limited', 'ai_unavailable', 'model_unavailable']);
@@ -74,6 +74,8 @@ export async function withFallback({ models, open, signal, delays = PASS_DELAYS_
         if (!RETRY_CODES.has(lastError.code)) throw lastError;
         if (isDailyQuota(err)) outOfQuota.add(model);
         console.warn(`[gemini] ${model} failed (${lastError.code})`);
+        // Every model is on the same host: if it cannot be reached, wait for the next pass.
+        if (isNetworkError(err)) break;
       }
     }
   }

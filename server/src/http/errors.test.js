@@ -30,6 +30,16 @@ describe('toAppError', () => {
     });
   });
 
+  it('does not mistake other TypeErrors for a network failure', () => {
+    const bug = new TypeError("Cannot read properties of undefined (reading 'networkStatus')");
+    expect(toAppError(bug).code).toBe('internal');
+  });
+
+  it('keeps the original error as the cause, for the server log', () => {
+    const original = new TypeError('fetch failed');
+    expect(toAppError(original).cause).toBe(original);
+  });
+
   it('hides unexpected errors behind a generic, retryable message', () => {
     const error = toAppError(new TypeError('Cannot read properties of undefined'));
     expect(error).toMatchObject({ code: 'internal', status: 500, retryable: true });

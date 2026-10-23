@@ -1,5 +1,6 @@
 import { ApiError } from '@google/genai';
 import multer from 'multer';
+import { inspect } from 'node:util';
 
 /** An error that is safe to show to the user. */
 export class AppError extends Error {
@@ -21,6 +22,21 @@ export function redactSecrets(text) {
 
 export function toAppError(err) {
   if (err instanceof AppError) return err;
+  const appError = classify(err);
+  // The original stays attached for the server log; the user only sees the AppError.
+  appError.cause = err;
+  return appError;
+}
+
+/**
+ * Node's fetch reports a connection that never opens as "fetch failed" and one
+ * that drops mid-response as "terminated", both as a TypeError.
+ */
+export function isNetworkError(err) {
+  return err instanceof TypeError && ['fetch failed', 'terminated'].includes(err.message);
+}
+
+function classify(err) {
   if (err?.name === 'AbortError') return new AppError('aborted', 'The request was cancelled.');
   // Errors from express.json(): the client's fault, not a server failure.
   if (err?.type === 'entity.too.large') {
@@ -37,8 +53,7 @@ export function toAppError(err) {
       : new AppError('bad_upload', 'The upload could not be read. Try again.');
   }
   if (err instanceof ApiError) return fromGeminiError(err);
-  // Node's fetch reports a connection that drops or never opens as a TypeError.
-  if (err instanceof TypeError && /fetch failed|terminated|network/i.test(err.message)) {
+  if (isNetworkError(err)) {
     return new AppError(
       'ai_unavailable',
       'Could not reach the AI service. Try again in a moment.',
@@ -98,7 +113,8 @@ export function publicError(appError) {
 }
 
 export function logError(context, err) {
-  console.error(`[${context}]`, redactSecrets(err?.stack ?? err));
+  // inspect() includes the chain of causes, such as the socket error behind "fetch failed".
+  console.error(`[${context}]`, redactSecrets(inspect(err, { depth: 4 })));
 }
 
 // Express recognises error handlers by their four arguments, so `next` must stay.

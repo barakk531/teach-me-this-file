@@ -35,6 +35,14 @@ describe('withFallback', () => {
     expect(calls).toEqual(['primary', 'fallback', 'primary']);
   });
 
+  it('waits for the next pass instead of trying other models when the network is down', async () => {
+    const { open, calls } = scripted([new TypeError('fetch failed')]);
+    await expect(withFallback({ models, open, delays: [0, 1] })).resolves.toBe(
+      'stream from primary',
+    );
+    expect(calls).toEqual(['primary', 'primary']);
+  });
+
   it('fails at once on errors that a retry cannot fix', async () => {
     const { open, calls } = scripted([new ApiError({ status: 400, message: 'API key not valid' })]);
     await expect(withFallback({ models, open, delays: [0, 1] })).rejects.toMatchObject({
