@@ -15,12 +15,21 @@ export function Composer({ streaming, onSend, onStop, dir }) {
   // The border is read from the style because display scaling makes it fractional.
   useLayoutEffect(() => {
     const el = inputRef.current;
-    el.style.height = 'auto';
-    const { borderTopWidth, borderBottomWidth } = getComputedStyle(el);
-    const height = Math.ceil(el.scrollHeight + parseFloat(borderTopWidth) + parseFloat(borderBottomWidth));
-    el.style.height = `${Math.min(height, MAX_HEIGHT)}px`;
-    el.style.overflowY = height > MAX_HEIGHT ? 'auto' : 'hidden';
-  }, [text]);
+    function fit() {
+      // Measured without a scrollbar, which would narrow the box and add lines.
+      el.style.overflowY = 'hidden';
+      el.style.height = 'auto';
+      const { borderTopWidth, borderBottomWidth } = getComputedStyle(el);
+      const border = parseFloat(borderTopWidth) + parseFloat(borderBottomWidth);
+      const height = Math.ceil(el.scrollHeight + border);
+      el.style.height = `${Math.min(height, MAX_HEIGHT)}px`;
+      if (height > MAX_HEIGHT) el.style.overflowY = 'auto';
+    }
+    fit();
+    // A narrower window wraps the same text onto more lines (a phone turned upright).
+    window.addEventListener('resize', fit);
+    return () => window.removeEventListener('resize', fit);
+  }, [text, dir]);
 
   function send() {
     const message = text.trim();
