@@ -37,6 +37,17 @@ export function toAppError(err) {
       : new AppError('bad_upload', 'The upload could not be read. Try again.');
   }
   if (err instanceof ApiError) return fromGeminiError(err);
+  // Node's fetch reports a connection that drops or never opens as a TypeError.
+  if (err instanceof TypeError && /fetch failed|terminated|network/i.test(err.message)) {
+    return new AppError(
+      'ai_unavailable',
+      'Could not reach the AI service. Try again in a moment.',
+      {
+        status: 503,
+        retryable: true,
+      },
+    );
+  }
   return new AppError('internal', 'Something went wrong on our side. Try again.', {
     status: 500,
     retryable: true,

@@ -1,4 +1,5 @@
 import { ThinkingLevel } from '@google/genai';
+import { AppError } from '../http/errors.js';
 import { streamText } from './gemini.js';
 import { buildTutorInstructions } from './prompts/tutorPrompt.js';
 import { parseTurn } from './turnParser.js';
@@ -36,6 +37,7 @@ export async function* runTutorTurn({
     },
   });
 
+  let hasText = false;
   for await (const event of parseTurn(chunks)) {
     if (event.type === 'meta') {
       if (!event.meta) console.warn('[tutor] reply had no valid status line; using defaults');
@@ -45,8 +47,17 @@ export async function* runTutorTurn({
         raw: event.meta,
       };
     } else {
+      hasText = true;
       yield { type: 'text', data: { text: event.text } };
     }
+  }
+  // Models occasionally return nothing. That is a failed turn (progress stays as it was
+  // and the student gets "Try again"), not an empty message from the tutor.
+  if (!hasText) {
+    throw new AppError('empty_reply', 'The AI sent back an empty answer. Try again.', {
+      status: 502,
+      retryable: true,
+    });
   }
 }
 

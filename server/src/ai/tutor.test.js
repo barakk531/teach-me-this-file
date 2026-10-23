@@ -1,6 +1,9 @@
-import { describe, expect, it } from 'vitest';
-import { buildContents } from './tutor.js';
+import { describe, expect, it, vi } from 'vitest';
+import { streamText } from './gemini.js';
+import { buildContents, runTutorTurn } from './tutor.js';
 import { buildTutorInstructions, STRUGGLE_ATTEMPTS } from './prompts/tutorPrompt.js';
+
+vi.mock('./gemini.js', () => ({ streamText: vi.fn() }));
 
 const plan = {
   title: 'Photosynthesis',
@@ -84,5 +87,44 @@ describe('buildTutorInstructions', () => {
     const text = build({ stepIndex: 1, attempts: 0, minutesElapsed: 8 });
     expect(text).toContain('1. [done] Inputs');
     expect(text).toContain('This is the last step.');
+  });
+});
+
+describe('runTutorTurn', () => {
+  const turn = () =>
+    runTutorTurn({
+      apiKey: 'test',
+      teacherPrompt: 'Be Socratic.',
+      plan,
+      progress: { stepIndex: 0, attempts: 0, minutesElapsed: 1 },
+      history: [{ role: 'tutor', text: 'What do plants need?' }],
+      studentMessage: 'Soil?',
+    });
+  const replyWith = (...chunks) =>
+    streamText.mockImplementation(async function* () {
+      yield* chunks;
+    });
+
+  it('streams the checked status line first, then the text', async () => {
+    replyWith(
+      '<turn>{"assessment":"incorrect","stepComplete":false,"sources":["P1"]}</turn>',
+      'Not quite.',
+    );
+    const events = [];
+    for await (const event of turn()) events.push(event);
+    expect(events.map((e) => e.type)).toEqual(['meta', 'text']);
+    expect(events[0].data).toEqual({
+      assessment: 'incorrect',
+      stepComplete: false,
+      sources: ['P1'],
+    });
+  });
+
+  it('turns an empty answer into a retryable failure, not an empty message', async () => {
+    replyWith('<turn>{"assessment":"none","stepComplete":false,"sources":[]}</turn>');
+    const drain = async () => {
+      for await (const event of turn()) void event;
+    };
+    await expect(drain()).rejects.toMatchObject({ code: 'empty_reply', retryable: true });
   });
 });

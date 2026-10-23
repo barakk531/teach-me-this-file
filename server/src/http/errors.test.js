@@ -23,6 +23,13 @@ describe('toAppError', () => {
     expect(toAppError(new ApiError({ status: 503, message: 'Overloaded' })).retryable).toBe(true);
   });
 
+  it('treats a dropped connection to the AI as the service being unreachable', () => {
+    expect(toAppError(new TypeError('fetch failed'))).toMatchObject({
+      code: 'ai_unavailable',
+      retryable: true,
+    });
+  });
+
   it('hides unexpected errors behind a generic, retryable message', () => {
     const error = toAppError(new TypeError('Cannot read properties of undefined'));
     expect(error).toMatchObject({ code: 'internal', status: 500, retryable: true });
