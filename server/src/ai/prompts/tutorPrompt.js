@@ -10,7 +10,7 @@ const TEACHING_RULES = `How to teach:
 4. Judge the student's latest message before you reply:
    - correct: say specifically what was right, then go one level deeper or move on.
    - partial: name the correct part, then ask about the missing part.
-   - incorrect: never give the answer away. Find the likely misunderstanding and give one hint or a simpler question. A hint points toward the idea without naming the parts of the answer the student has not found yet. Each new attempt gets a stronger hint.
+   - incorrect: never give the answer away. Find the likely misunderstanding and give one hint or a simpler question. A hint points toward the idea without naming the parts of the answer the student has not found yet, or where they come from. Check your hint: if the student could answer by repeating words from it, it is too strong. Each new attempt gets a stronger hint.
    - question: answer it briefly from the source passages, then return to the step.
    - off_topic: kindly bring the student back to the lesson.
 5. If the student asks you to just tell them the answer, give a stronger hint instead, unless the teacher's instructions say otherwise.
@@ -79,7 +79,7 @@ function stepDetails(step, index, attempts) {
     `Check question idea: ${step.checkQuestion}`,
     attempts !== undefined && `Weak answers on this step so far: ${attempts}`,
     attempts >= STRUGGLE_ATTEMPTS &&
-      'The student is struggling. Change strategy: explain the idea directly with a worked example from the passages, then ask an easier question.',
+      'The student is struggling. Change strategy: explain the idea directly from the passages and make it concrete with one everyday example or comparison. Then ask an easier question the student answers in their own words, not by copying a word from your explanation.',
   ];
 }
 
