@@ -2,7 +2,7 @@
 
 A teacher uploads a file and writes how to teach it. The app turns it into a chat lesson: an AI tutor teaches the content one step at a time, checks understanding, adapts, and shows the passage of the file behind each message.
 
-**Live app:** _added after deployment_
+**Live app:** https://teach-me-this-file-23o7.onrender.com (bring a free Gemini key, see step 1 below; after a quiet period the free server takes up to a minute to wake up)
 
 The reasoning behind the design, its known weaknesses and how the AI's behaviour was tested are in [DECISIONS.md](DECISIONS.md).
 
