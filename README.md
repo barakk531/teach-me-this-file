@@ -8,7 +8,13 @@ The reasoning behind the design, its known weaknesses and how the AI's behaviour
 
 ## Using the app
 
-1. **Add a Gemini API key.** Click **API key** (top right) and paste a free key from [Google AI Studio](https://aistudio.google.com/apikey). By default the key is kept only for the current tab; tick "Remember on this device" to keep it. It is sent to the server with each request and never stored there.
+1. **Add a Gemini API key.** Each user brings their own free key:
+   1. Open [aistudio.google.com/apikey](https://aistudio.google.com/apikey) and sign in with a Google account.
+   2. Click **Create API key** and copy the key. The free tier needs no credit card.
+   3. In the app, click **API key** (top right), paste the key and click **Save key**. The app also opens this dialog by itself if you create a lesson without a key.
+
+   By default the key is kept only for the current tab; tick "Remember on this device" to keep it. It is sent to the server with each request and never stored there.
+
 2. **Upload the material.** PDF (including scanned pages), a photo (PNG, JPG, WEBP, HEIC), a Word document (.docx) or a text file (.txt, .md, .csv), up to 20 MB. On a phone you can take a photo of a page.
 3. **Say how to teach it**, for example: _"Teach this to 7th graders, in French. Be Socratic. Keep it under 15 minutes."_
 4. **Check the lesson plan** and press **Start the lesson**.
@@ -32,6 +38,7 @@ Open http://localhost:5173. The API runs on port 3001 and Vite forwards `/api` t
 Optionally, create a `.env` file at the project root to give the server its own key (then the key field in the app becomes optional):
 
 ```bash
+# A free key from https://aistudio.google.com/apikey ("Create API key")
 GEMINI_API_KEY=your-key
 # Models tried in order (each has its own free daily quota)
 # GEMINI_MODELS=gemini-3.6-flash,gemini-3.8-flash,gemini-3.5-flash-lite

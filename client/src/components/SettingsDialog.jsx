@@ -58,17 +58,32 @@ function SettingsForm({ saved, serverKey, onClose }) {
         </button>
       </div>
       <p className="mt-2 text-[15px] text-muted">
-        Lessons are generated with Google Gemini. Paste a free key from{' '}
-        <a
-          href="https://aistudio.google.com/apikey"
-          target="_blank"
-          rel="noreferrer"
-          className="font-medium text-pen underline underline-offset-2"
-        >
-          Google AI Studio
-        </a>
-        . It is sent to our server with each request, used for that request only, and never stored
-        there.
+        Lessons are generated with Google Gemini, so the app needs a Gemini API key. Getting one is
+        free and takes a minute:
+      </p>
+      <ol className="mt-2 list-decimal space-y-1 ps-5 text-[15px]">
+        <li>
+          Open{' '}
+          <a
+            href="https://aistudio.google.com/apikey"
+            target="_blank"
+            rel="noreferrer"
+            className="font-medium text-pen underline underline-offset-2"
+          >
+            aistudio.google.com/apikey
+          </a>{' '}
+          and sign in with a Google account.
+        </li>
+        <li>
+          Click <strong>Create API key</strong> and copy the key. No credit card is needed.
+        </li>
+        <li>
+          Paste it below and click <strong>Save key</strong>.
+        </li>
+      </ol>
+      <p className="mt-3 text-[15px] text-muted">
+        The key is sent to our server with each request, used for that request only, and never
+        stored there.
       </p>
       {serverKey && (
         <p className="mt-2 text-[15px] text-muted">
