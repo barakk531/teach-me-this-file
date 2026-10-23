@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Icon } from '../ui/Icon.jsx';
 
-export const MAX_FILE_BYTES = 20 * 1024 * 1024;
+const MAX_FILE_BYTES = 20 * 1024 * 1024;
 const EXTENSIONS = [
   'pdf',
   'png',

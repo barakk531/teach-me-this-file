@@ -1,7 +1,9 @@
+import { readFile } from 'node:fs/promises';
 import { describe, expect, it } from 'vitest';
 import { detectType, readUpload } from './readUpload.js';
 
 const bytes = (text) => Buffer.from(text, 'latin1');
+const sample = (name) => readFile(new URL(`../../../samples/${name}`, import.meta.url));
 
 describe('detectType', () => {
   it('recognises files by their content, not their name', () => {
@@ -32,6 +34,17 @@ describe('readUpload', () => {
     });
     expect(part.text).toContain('מחזור המים בטבע');
     expect(part.text).toMatch(/^<document format="text">/);
+  });
+
+  it('converts a Word document to HTML, keeping headings and tables', async () => {
+    const [part] = await readUpload({
+      buffer: await sample('cells-plant-vs-animal.docx'),
+      originalname: 'cells-plant-vs-animal.docx',
+    });
+    expect(part.text).toMatch(/^<document format="html">/);
+    expect(part.text).toContain('<h1>Cells: Plant and Animal</h1>');
+    expect(part.text).toContain('<table>');
+    expect(part.text).toContain('Yes, made of cellulose');
   });
 
   it('sends PDFs to the model as inline data', async () => {

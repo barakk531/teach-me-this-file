@@ -60,7 +60,7 @@ function splitStatus(buffer, isFinal) {
   return { meta: null, rest: buffer };
 }
 
-export function parseMeta(json) {
+function parseMeta(json) {
   try {
     const raw = JSON.parse(json);
     return {
