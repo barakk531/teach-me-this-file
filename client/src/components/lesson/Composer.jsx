@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import { Icon } from '../ui/Icon.jsx';
 
 const MAX_CHARS = 2000;
+const MAX_HEIGHT = 160;
 // On touch keyboards Enter adds a new line; the send button sends.
 const enterSends = () => window.matchMedia('(pointer: fine)').matches;
 
@@ -9,11 +10,16 @@ export function Composer({ streaming, onSend, onStop, dir }) {
   const [text, setText] = useState('');
   const inputRef = useRef(null);
 
-  // Grow with the text, up to a few lines.
+  // Grow with the text, up to a few lines. scrollHeight leaves out the border,
+  // so it is added back; otherwise one line overflows and shows a scrollbar.
+  // The border is read from the style because display scaling makes it fractional.
   useLayoutEffect(() => {
     const el = inputRef.current;
     el.style.height = 'auto';
-    el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
+    const { borderTopWidth, borderBottomWidth } = getComputedStyle(el);
+    const height = Math.ceil(el.scrollHeight + parseFloat(borderTopWidth) + parseFloat(borderBottomWidth));
+    el.style.height = `${Math.min(height, MAX_HEIGHT)}px`;
+    el.style.overflowY = height > MAX_HEIGHT ? 'auto' : 'hidden';
   }, [text]);
 
   function send() {
@@ -50,7 +56,7 @@ export function Composer({ streaming, onSend, onStop, dir }) {
             }
           }}
           placeholder="Write your answer…"
-          className="min-h-11 flex-1 resize-none rounded-xl border border-line bg-paper px-3.5 py-2.5 text-[17px] leading-normal placeholder:text-muted/80 focus:border-pen focus:bg-white focus:outline-none"
+          className="min-h-11 flex-1 resize-none rounded-xl border border-line bg-paper px-3.5 py-2 text-[17px] leading-normal placeholder:text-muted/80 focus:border-pen focus:bg-white focus:outline-none"
         />
         {streaming ? (
           <button
