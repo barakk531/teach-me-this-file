@@ -52,6 +52,19 @@ export const plannerScenarios = [
     ],
   },
   {
+    id: 'very-long-document',
+    title: 'A 332-page textbook: teach one chapter of it',
+    file: 'astronomy-textbook-332-pages.pdf',
+    prompt: 'Teach the chapter about the Moon to 8th graders, in English. About 10 minutes.',
+    check: (plan) => [
+      stepCount(plan),
+      plan.passages.filter((p) => /moon/i.test(p.text)).length >= plan.passages.length / 2
+        ? null
+        : 'most passages are not about the Moon: the planner did not find the chapter',
+      plan.scope ? null : 'no scope note saying what was left out',
+    ],
+  },
+  {
     id: 'not-teachable',
     title: 'A receipt: nothing to teach',
     file: 'grocery-receipt.txt',

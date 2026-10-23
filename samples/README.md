@@ -8,6 +8,7 @@ Small files for trying the app. Each one tests a different kind of real school m
 | `water-cycle-hebrew.pdf` | Right-to-left text (Hebrew) with a numbered list and a table. |
 | `fractions-worksheet-scanned.pdf` | A scanned page: an image-only PDF with no text layer, skewed and noisy, with stacked fractions. |
 | `fractions-worksheet-photo.jpg` | The same worksheet as a phone photo (image upload path). |
+| `astronomy-textbook-332-pages.pdf` | A very long document: Robert S. Ball's _The Story of the Heavens_ (public domain, Project Gutenberg), 332 pages. Ask for one chapter, for example the Moon. |
 | `cells-plant-vs-animal.docx` | A Word handout with headings and a comparison table (converted to HTML so the table survives). |
 | `solar-system-hidden-instructions.txt` | Unexpected content: the file contains instructions aimed at the AI ("ignore all previous instructions..."). The tutor must ignore them. |
 | `grocery-receipt.txt` | A file with nothing to teach. The app must say so instead of inventing a lesson. |
