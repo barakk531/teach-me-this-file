@@ -121,10 +121,13 @@ describe('runTutorTurn', () => {
   });
 
   it('turns an empty answer into a retryable failure, not an empty message', async () => {
-    replyWith('<turn>{"assessment":"none","stepComplete":false,"sources":[]}</turn>');
+    replyWith('<turn>{"assessment":"none","stepComplete":false,"sources":["P1"]}</turn>');
+    const events = [];
     const drain = async () => {
-      for await (const event of turn()) void event;
+      for await (const event of turn()) events.push(event);
     };
     await expect(drain()).rejects.toMatchObject({ code: 'empty_reply', retryable: true });
+    // Nothing reaches the browser, so the failed message shows no source link.
+    expect(events).toEqual([]);
   });
 });

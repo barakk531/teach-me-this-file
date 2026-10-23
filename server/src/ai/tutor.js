@@ -37,16 +37,23 @@ export async function* runTutorTurn({
     },
   });
 
+  let meta = null;
   let hasText = false;
   for await (const event of parseTurn(chunks)) {
     if (event.type === 'meta') {
       if (!event.meta) console.warn('[tutor] reply had no valid status line; using defaults');
-      yield {
+      meta = {
         type: 'meta',
         data: checkMeta(event.meta, plan, progress.stepIndex, studentMessage),
         raw: event.meta,
       };
     } else {
+      // The status line goes out with the first text, so a reply that turns out
+      // empty sends nothing, and the failed message gets no source link.
+      if (meta) {
+        yield meta;
+        meta = null;
+      }
       hasText = true;
       yield { type: 'text', data: { text: event.text } };
     }
