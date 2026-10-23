@@ -13,6 +13,9 @@ const base = {
   history: [OPENING],
 };
 
+// The fixture's teacher asks for a Socratic lesson; this one names no style.
+const PLAIN_PROMPT = 'Teach this to 7th graders. Keep it under 10 minutes.';
+
 /**
  * Each scenario is one tutor turn in a known situation, with hard checks on
  * the hidden status line and a rubric for an AI judge on the visible reply.
@@ -20,7 +23,7 @@ const base = {
 export const tutorScenarios = [
   {
     id: 'lesson-start',
-    title: 'Starts the lesson with a question, not a lecture',
+    title: 'Socratic lesson start: a guiding question, not a lecture',
     input: {
       ...base,
       history: [],
@@ -30,6 +33,28 @@ export const tutorScenarios = [
     expect: { assessment: ['none'], stepComplete: false },
     rubric:
       'PASS only if the reply greets the student briefly, says what the lesson is about, and ends with exactly one open question that makes the student think (not a yes/no question such as "Are you ready?"). FAIL if it explains the whole topic, lists the answers, or asks several questions.',
+  },
+  {
+    id: 'teach-first',
+    title: 'Lesson start with no style asked: teaches the first idea, then asks',
+    input: {
+      ...base,
+      teacherPrompt: PLAIN_PROMPT,
+      history: [],
+      studentMessage: null,
+      progress: { ...base.progress, minutesElapsed: 0 },
+    },
+    expect: { assessment: ['none'], stepComplete: false },
+    rubric:
+      'The teacher did not ask for a Socratic style and the student knows nothing yet. PASS only if the reply greets the student briefly, then teaches a first idea in simple words with an everyday example or comparison (for example that plants make their own food), and ends with exactly one question about what it just explained, which the student can answer from that explanation and their own experience. FAIL if it opens with a question about something it has not taught yet, if it lectures through the whole step at once (every input, where each one enters, and the equation), or if it asks several questions.',
+  },
+  {
+    id: 'says-continue',
+    title: 'Student only writes "continue": explains more, not the same question',
+    input: { ...base, teacherPrompt: PLAIN_PROMPT, studentMessage: 'continue' },
+    expect: { stepComplete: false },
+    rubric:
+      'The tutor opened with a question, and the student, who has not been taught anything yet, wrote only "continue". PASS only if the tutor now explains something in simple words (for example that a plant makes its own food from things it takes in around it) and then asks one question that is easier than the opening question. FAIL if it asks the opening question again, only urges the student to try ("Give it a try!"), or gives a hint without explaining anything.',
   },
   {
     id: 'wrong-answer',
