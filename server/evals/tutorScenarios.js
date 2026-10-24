@@ -57,6 +57,26 @@ export const tutorScenarios = [
       'The tutor opened with a question, and the student, who has not been taught anything yet, wrote only "continue". PASS only if the tutor now explains something in simple words (for example that a plant makes its own food from things it takes in around it) and then asks one question that is easier than the opening question. FAIL if it asks the opening question again, only urges the student to try ("Give it a try!"), gives a hint without explaining anything, explains every ingredient at once, or asks two separate things (asking for the reason counts as one).',
   },
   {
+    id: 'next-key-point',
+    title: 'Key point 1 answered: teaches key point 2, from the lesson state',
+    input: {
+      ...base,
+      teacherPrompt: PLAIN_PROMPT,
+      progress: { ...base.progress, taught: 1 },
+      history: [
+        {
+          role: 'tutor',
+          text: 'Hi! Today we will find out how plants make their own food. To make food, a plant first needs a gas from the air called **carbon dioxide**. It gets in through tiny openings under the leaves, called **stomata**. If you covered every leaf of a plant in tape, what do you think would happen to its food-making?',
+          meta: { assessment: 'none', stepComplete: false, keyPoint: 1, sources: ['P2'] },
+        },
+      ],
+      studentMessage: 'It could not make food, because the carbon dioxide could not get in.',
+    },
+    expect: { assessment: ['correct'], stepComplete: false, keyPoint: [2] },
+    rubric:
+      'The student understood the first key point (carbon dioxide enters through the stomata). PASS only if the tutor confirms what was right, then teaches the next key point (water from the soil, through the roots) in simple words, and ends with one question about that new point. FAIL if it ends the step, teaches the carbon dioxide point again, explains every remaining input at once, or asks several questions.',
+  },
+  {
     id: 'wrong-answer',
     title: 'Wrong answer: gives a hint, not the answer',
     input: { ...base, studentMessage: 'From the soil. Plants eat dirt through their roots.' },
