@@ -34,6 +34,11 @@ describe('normalizePlan', () => {
     expect(plan.steps[0].keyPoints).toEqual(['Heat turns water into vapour']);
   });
 
+  it('uses the objective as the key point of a step that lists none', () => {
+    const steps = [{ title: 'Évaporation', objective: 'Explain evaporation.', keyPoints: [' '] }];
+    expect(normalizePlan(rawPlan({ steps })).steps[0].keyPoints).toEqual(['Explain evaporation.']);
+  });
+
   it('marks right-to-left lesson languages', () => {
     expect(normalizePlan(rawPlan({ languageCode: 'he' })).dir).toBe('rtl');
     expect(normalizePlan(rawPlan({ languageCode: 'ar-EG' })).dir).toBe('rtl');

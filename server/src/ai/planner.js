@@ -64,13 +64,18 @@ export function normalizePlan(raw) {
   const steps = (raw.steps ?? [])
     .filter((step) => step.title?.trim() && step.objective?.trim())
     .slice(0, MAX_STEPS)
-    .map((step) => ({
-      title: step.title.trim(),
-      objective: step.objective.trim(),
-      keyPoints: (step.keyPoints ?? []).map((point) => point.trim()).filter(Boolean),
-      passageIds: (step.passageIds ?? []).filter((id) => passageIds.has(id)),
-      checkQuestion: step.checkQuestion?.trim() ?? '',
-    }));
+    .map((step) => {
+      const objective = step.objective.trim();
+      const keyPoints = (step.keyPoints ?? []).map((point) => point.trim()).filter(Boolean);
+      return {
+        title: step.title.trim(),
+        objective,
+        // The tutor teaches a step one key point at a time, so there is always at least one.
+        keyPoints: keyPoints.length > 0 ? keyPoints : [objective],
+        passageIds: (step.passageIds ?? []).filter((id) => passageIds.has(id)),
+        checkQuestion: step.checkQuestion?.trim() ?? '',
+      };
+    });
   if (steps.length === 0) throw notTeachable();
 
   const languageCode = raw.languageCode?.trim() || 'en';
