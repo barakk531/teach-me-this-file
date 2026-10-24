@@ -67,3 +67,25 @@ Tutor and judge both on Flash-Lite, so I graded these by hand as well.
 > You got one of them! Plants do take in water from the soil through their roots. But they don't actually eat dirt—just water.
 >
 > Think about what is all around the plant in the air, or what shines down on it on a sunny day. What else do you think a plant needs to make its food?
+
+## Key points in the lesson state
+
+After the third code review, the lesson state records how many key points of each step have been taught, and the status line reports the key point each reply teaches. Both runs below are on Flash-Lite, with the status line shown.
+
+**`next-key-point`: pass.** Key point 1 is marked taught in the state, and the student has just answered it correctly.
+
+> `<turn>{"assessment":"correct","stepComplete":false,"keyPoint":2,"sources":["P2"]}</turn>`
+>
+> Spot on! Without those openings, the carbon dioxide can't get inside.
+>
+> The plant's second ingredient is **water**. It drinks water from the soil using its **roots**, and then the water travels all the way up the stem to the leaves.
+>
+> Think about watering a plant: if you only poured water on the upper leaves and kept the dirt completely dry, what do you think would happen to the plant after a few days?
+
+**`teach-first`: pass, key point 1.**
+
+> `<turn>{"assessment":"none","stepComplete":false,"keyPoint":1,"sources":["P1","P2"]}</turn>`
+>
+> Unlike us, plants can't just grab a snack from the kitchen; they have to make their own! To start cooking, a plant needs a specific gas from the air called **carbon dioxide**. It breathes this gas in through tiny, microscopic openings on the underside of its leaves known as **stomata**.
+>
+> Imagine you are a plant standing outside. Without moving around, how do you think you manage to pull that invisible **carbon dioxide** right out of the air?

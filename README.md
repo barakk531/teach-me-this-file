@@ -57,7 +57,7 @@ Leave `GEMINI_API_KEY` unset on a public deployment, because anyone who opens th
 
 `npm run eval -- tutor`, `npm run eval -- planner`, `--only <id>` and `--runs 3` narrow or repeat the evals. Reports go to `server/evals/results/`, and the reports behind DECISIONS.md are in [docs/evals](docs/evals/).
 
-Free Gemini keys allow about 20 requests per model per day, and one full eval run uses about 18 for the tutor model and 11 for the judge. To measure a single model, pin it: `GEMINI_MODELS=gemini-3.6-flash EVAL_JUDGE_MODEL=gemini-3.8-flash npm run eval`.
+Free Gemini keys allow about 20 requests per model per day, and one full eval run uses about 19 for the tutor model and 12 for the judge. To measure a single model, pin it: `GEMINI_MODELS=gemini-3.6-flash EVAL_JUDGE_MODEL=gemini-3.8-flash npm run eval`.
 
 ## How it is built
 
@@ -78,7 +78,7 @@ samples/        files for trying the app
 ```
 
 - The planner (`POST /api/plan`) reads the whole file once and returns a lesson plan as JSON: steps (objective, key points, check question) and short passages copied word for word from the file, which each step links to. It streams its progress while it works.
-- The tutor (`POST /api/turn`) streams one reply per turn. Its instructions are rebuilt from app state each time (plan, current step, weak answers so far, time used), so the file and the full chat history are never sent again. Each reply starts with a hidden status line (`assessment`, `stepComplete`, `sources`) that the app uses to update progress and show sources.
+- The tutor (`POST /api/turn`) streams one reply per turn. Its instructions are rebuilt from app state each time (plan, current step, key points taught, weak answers so far, time used), so the file and the full chat history are never sent again. Each reply starts with a hidden status line (`assessment`, `stepComplete`, `keyPoint`, `sources`) that the app uses to update progress and show sources.
 - The lesson state lives in the browser, in a reducer. The server stores nothing.
 
 ## Deployment
