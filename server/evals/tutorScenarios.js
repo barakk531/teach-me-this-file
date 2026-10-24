@@ -54,7 +54,7 @@ export const tutorScenarios = [
     input: { ...base, teacherPrompt: PLAIN_PROMPT, studentMessage: 'continue' },
     expect: { stepComplete: false },
     rubric:
-      'The tutor opened with a question, and the student, who has not been taught anything yet, wrote only "continue". PASS only if the tutor now explains something in simple words (for example that a plant makes its own food from things it takes in around it) and then asks one question that is easier than the opening question. FAIL if it asks the opening question again, only urges the student to try ("Give it a try!"), or gives a hint without explaining anything.',
+      'The tutor opened with a question, and the student, who has not been taught anything yet, wrote only "continue". PASS only if the tutor now explains something in simple words (for example that a plant makes its own food from things it takes in around it) and then asks one question that is easier than the opening question. FAIL if it asks the opening question again, only urges the student to try ("Give it a try!"), gives a hint without explaining anything, explains every ingredient at once, or asks two separate things (asking for the reason counts as one).',
   },
   {
     id: 'wrong-answer',
