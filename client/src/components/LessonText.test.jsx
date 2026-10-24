@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
@@ -28,10 +29,33 @@ describe('LessonText', () => {
     expect(render('Area: $x^2$')).toContain('class="katex"');
   });
 
-  it('loads the KaTeX stylesheet of the version that renders the formulas', () => {
-    // KaTeX renames its CSS classes between versions; a mismatch breaks formulas mid-symbol.
+  it('has a style for every part of a rendered formula', () => {
+    // KaTeX renames its CSS classes between versions: a stylesheet that does not match the
+    // renderer leaves formulas unstyled, and they break mid-symbol.
     const require = createRequire(import.meta.url);
-    const rehypeRequire = createRequire(require.resolve('rehype-katex'));
-    expect(require('katex/package.json').version).toBe(rehypeRequire('katex/package.json').version);
+    const css = readFileSync(require.resolve('katex/dist/katex.min.css'), 'utf8');
+    const html = render(String.raw`$6CO_2 \xrightarrow{light} C_6H_{12}O_6$ and $\frac{1}{2}$`);
+    const formulas = html.slice(html.indexOf('class="katex"'));
+    const classes = [...formulas.matchAll(/class="([^"]+)"/g)].flatMap((m) => m[1].split(' '));
+    const hasRule = (name) => new RegExp(String.raw`\.${name}(?![\w-])`).test(css);
+    const unstyled = classes.filter((name) => !ATOM_TYPES.has(name) && !hasRule(name));
+    expect(unstyled).toEqual([]);
+  });
+
+  it('shows a broken formula from the model instead of failing', () => {
+    expect(() => render(String.raw`Half is $\frac{1}{$`)).not.toThrow();
   });
 });
+
+// Classes that only name the kind of math symbol; KaTeX's stylesheet has no rules for them.
+const ATOM_TYPES = new Set([
+  'mord',
+  'mop',
+  'mbin',
+  'mrel',
+  'mopen',
+  'mclose',
+  'mpunct',
+  'minner',
+  'mtight',
+]);
