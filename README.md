@@ -57,7 +57,7 @@ Leave `GEMINI_API_KEY` unset on a public deployment, because anyone who opens th
 
 `npm run eval -- tutor`, `npm run eval -- planner`, `--only <id>` and `--runs 3` narrow or repeat the evals. Reports go to `server/evals/results/`, and the reports behind DECISIONS.md are in [docs/evals](docs/evals/).
 
-Free Gemini keys allow about 20 requests per model per day, and one full eval run uses about 15 for the tutor model and 9 for the judge. To measure a single model, pin it: `GEMINI_MODELS=gemini-3.6-flash EVAL_JUDGE_MODEL=gemini-3.8-flash npm run eval`.
+Free Gemini keys allow about 20 requests per model per day, and one full eval run uses about 18 for the tutor model and 11 for the judge. To measure a single model, pin it: `GEMINI_MODELS=gemini-3.6-flash EVAL_JUDGE_MODEL=gemini-3.8-flash npm run eval`.
 
 ## How it is built
 
