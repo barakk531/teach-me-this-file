@@ -24,6 +24,8 @@ export function lessonReducer(state, action) {
         progress: {
           stepIndex: 0,
           attempts: action.plan.steps.map(() => 0),
+          // How many of each step's key points the tutor has taught, in order.
+          taught: action.plan.steps.map(() => 0),
           activeMs: 0,
           lastActiveAt: null,
         },
@@ -101,13 +103,15 @@ function applyAssessment(state, meta) {
   const attempts = progress.attempts.map((count, i) =>
     i === progress.stepIndex && weakAnswer ? count + 1 : count,
   );
-  if (!meta.stepComplete) return { ...state, progress: { ...progress, attempts } };
-
-  const stepIndex = progress.stepIndex + 1;
+  const stepIndex = meta.stepComplete ? progress.stepIndex + 1 : progress.stepIndex;
+  // A reply that completes a step opens the next one, so the key point it taught belongs there.
+  const taught = progress.taught.map((count, i) =>
+    i === stepIndex ? Math.max(count, meta.keyPoint ?? 0) : count,
+  );
   return {
     ...state,
     status: stepIndex >= plan.steps.length ? 'complete' : state.status,
-    progress: { ...progress, attempts, stepIndex },
+    progress: { ...progress, attempts, taught, stepIndex },
   };
 }
 

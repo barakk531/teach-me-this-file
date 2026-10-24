@@ -98,10 +98,15 @@ function toTurn(message) {
 function checkMeta(meta, plan, stepIndex, studentMessage) {
   const known = new Set(plan.passages.map((p) => p.id));
   const sources = (meta?.sources ?? []).filter((id) => known.has(id));
+  // A step can only be completed by something the student said.
+  const stepComplete = Boolean(studentMessage && meta?.stepComplete);
+  // A reply that completes a step also opens the next one, so its key point belongs there.
+  const keyPoints = plan.steps[stepComplete ? stepIndex + 1 : stepIndex]?.keyPoints ?? [];
+  const keyPoint = meta?.keyPoint ?? 0;
   return {
     assessment: studentMessage ? (meta?.assessment ?? 'none') : 'none',
-    // A step can only be completed by something the student said.
-    stepComplete: Boolean(studentMessage && meta?.stepComplete),
+    stepComplete,
+    keyPoint: keyPoint <= keyPoints.length ? keyPoint : 0,
     sources: sources.length > 0 ? sources : (plan.steps[stepIndex]?.passageIds ?? []),
   };
 }

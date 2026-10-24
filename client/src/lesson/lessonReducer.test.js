@@ -28,14 +28,44 @@ function tutorTurn(id, meta, { text = 'Reply', end = 'finished' } = {}) {
   return actions;
 }
 
-const meta = (assessment, stepComplete = false) => ({ assessment, stepComplete, sources: ['P1'] });
+const meta = (assessment, stepComplete = false, keyPoint = 0) => ({
+  assessment,
+  stepComplete,
+  keyPoint,
+  sources: ['P1'],
+});
 const say = (id, text, at = 0) => ({ type: 'studentMessageSent', id, text, at });
 
 describe('lessonReducer', () => {
   it('stores the plan and starts progress at step 1', () => {
     const lesson = run([created]);
     expect(lesson.status).toBe('ready');
-    expect(lesson.progress).toMatchObject({ stepIndex: 0, attempts: [0, 0] });
+    expect(lesson.progress).toMatchObject({ stepIndex: 0, attempts: [0, 0], taught: [0, 0] });
+  });
+
+  it('records the key points taught, on the step each reply ends on', () => {
+    const lesson = run([
+      created,
+      ...tutorTurn('t1', meta('none', false, 1)),
+      say('s1', 'Light'),
+      ...tutorTurn('t2', meta('correct', false, 2)),
+      say('s2', 'And water'),
+      // Completes step 1 and teaches the first key point of step 2.
+      ...tutorTurn('t3', meta('correct', true, 1)),
+    ]);
+    expect(lesson.progress.taught).toEqual([2, 1]);
+  });
+
+  it('never counts taught key points backwards or from a failed reply', () => {
+    const lesson = run([
+      created,
+      ...tutorTurn('t1', meta('none', false, 2)),
+      say('s1', 'Explain again?'),
+      ...tutorTurn('t2', meta('question', false, 1)),
+      say('s2', 'Ok'),
+      ...tutorTurn('t3', meta('correct', false, 3), { end: 'failed' }),
+    ]);
+    expect(lesson.progress.taught).toEqual([2, 0]);
   });
 
   it('counts weak answers on the current step without advancing', () => {
@@ -109,12 +139,12 @@ describe('turn requests', () => {
   it('sends progress from app state and only finished messages as history', () => {
     const lesson = run([
       created,
-      ...tutorTurn('t1', meta('none')),
+      ...tutorTurn('t1', meta('none', false, 1)),
       say('s1', 'Light'),
       ...tutorTurn('t2', meta('partial')),
     ]);
     const request = turnRequest(lesson, 'Light and water');
-    expect(request.progress).toEqual({ stepIndex: 0, attempts: 1, minutesElapsed: 0 });
+    expect(request.progress).toEqual({ stepIndex: 0, attempts: 1, taught: 1, minutesElapsed: 0 });
     expect(request.history.map((m) => m.role)).toEqual(['tutor', 'student', 'tutor']);
     expect(request.studentMessage).toBe('Light and water');
   });

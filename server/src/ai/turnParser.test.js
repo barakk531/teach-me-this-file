@@ -16,12 +16,18 @@ async function collect(chunks) {
   return { events, meta, text };
 }
 
-const STATUS = '<turn>{"assessment":"incorrect","stepComplete":false,"sources":["P2"]}</turn>';
+const STATUS =
+  '<turn>{"assessment":"incorrect","stepComplete":false,"keyPoint":2,"sources":["P2"]}</turn>';
 
 describe('parseTurn', () => {
   it('separates the hidden status line from the visible message', async () => {
     const { meta, text } = await collect([`${STATUS}\n\nNot quite. What happens to the heat?`]);
-    expect(meta).toEqual({ assessment: 'incorrect', stepComplete: false, sources: ['P2'] });
+    expect(meta).toEqual({
+      assessment: 'incorrect',
+      stepComplete: false,
+      keyPoint: 2,
+      sources: ['P2'],
+    });
     expect(text).toBe('Not quite. What happens to the heat?');
   });
 
@@ -47,9 +53,9 @@ describe('parseTurn', () => {
 
   it('sanitises unexpected values in the status line', async () => {
     const { meta } = await collect([
-      '<turn>{"assessment":"genius","stepComplete":"yes","sources":["P1",7]}</turn>Hi',
+      '<turn>{"assessment":"genius","stepComplete":"yes","keyPoint":"2","sources":["P1",7]}</turn>Hi',
     ]);
-    expect(meta).toEqual({ assessment: 'none', stepComplete: false, sources: ['P1'] });
+    expect(meta).toEqual({ assessment: 'none', stepComplete: false, keyPoint: 0, sources: ['P1'] });
   });
 
   it('handles a reply that is only a status line', async () => {

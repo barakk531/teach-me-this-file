@@ -83,6 +83,14 @@ describe('buildTutorInstructions', () => {
     expect(stuck).toContain('The student is struggling');
   });
 
+  it('marks which key points are taught, and asks for the check once all are', () => {
+    const first = build({ stepIndex: 0, attempts: 0, taught: 1, minutesElapsed: 2 });
+    expect(first).toContain('1. [taught] Light\n2. [next] Water');
+    expect(first).not.toContain('Every key point is taught');
+    const all = build({ stepIndex: 0, attempts: 0, taught: 2, minutesElapsed: 4 });
+    expect(all).toContain('Every key point is taught');
+  });
+
   it('tells the tutor to close the lesson on the last step', () => {
     const text = build({ stepIndex: 1, attempts: 0, minutesElapsed: 8 });
     expect(text).toContain('1. [done] Inputs');
@@ -116,8 +124,21 @@ describe('runTutorTurn', () => {
     expect(events[0].data).toEqual({
       assessment: 'incorrect',
       stepComplete: false,
+      keyPoint: 0,
       sources: ['P1'],
     });
+  });
+
+  it('keeps only key points that exist, on the step the reply ends on', async () => {
+    const metaOf = async (status) => {
+      replyWith(`<turn>${status}</turn>`, 'Reply.');
+      for await (const event of turn()) if (event.type === 'meta') return event.data;
+    };
+    expect(await metaOf('{"assessment":"none","keyPoint":2}')).toMatchObject({ keyPoint: 2 });
+    expect(await metaOf('{"assessment":"none","keyPoint":3}')).toMatchObject({ keyPoint: 0 });
+    // Completing step 1 opens step 2, whose key points are counted instead.
+    const opened = '{"assessment":"correct","stepComplete":true,"keyPoint":2}';
+    expect(await metaOf(opened)).toMatchObject({ stepComplete: true, keyPoint: 2 });
   });
 
   it('turns an empty answer into a retryable failure, not an empty message', async () => {

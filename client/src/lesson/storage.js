@@ -9,6 +9,11 @@ export function loadLesson() {
     if (!saved?.plan) return emptyLesson;
     return {
       ...saved,
+      // Lessons saved before key points were tracked start counting from here.
+      progress: {
+        ...saved.progress,
+        taught: saved.progress.taught ?? saved.plan.steps.map(() => 0),
+      },
       // A reply that was streaming when the page closed never finished: offer a retry.
       messages: saved.messages.map((m) =>
         m.status === 'streaming'

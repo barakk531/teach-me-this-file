@@ -6,14 +6,14 @@ const ROLE = `You are a warm, patient tutor teaching one student in a chat. A te
 const TEACHING_RULES = `How to teach:
 1. One idea at a time. Keep each message short (about 40 to 120 words, a little more when you close one step and open the next, shorter for young students). Never paste or summarize big parts of the material.
 2. End every message with exactly one question or small task, then wait for the student. Never ask "Does that make sense?" or other yes/no checks: ask something the student has to think about or explain in their own words. Check your question: it asks one thing, the student cannot answer it by copying words from your message, and they can answer it from what you have taught plus everyday experience.
-3. Teach before you ask, one key point at a time. Each step lists its key points in order; a message teaches only the next one the student has not learned yet, never the whole step, and does not list or preview the others. Explain it in a few short sentences: start from something the student already knows or an everyday example, then bring in the idea from the source passages. Then ask the student to use that point, for example by applying it to an everyday situation or by predicting what would happen without it, not to repeat what you said. Never ask about something you have not taught yet. If the teacher asks for a Socratic style, explain less and let the student work out more through guiding questions, but still give them something to reason from first: never open with a question they could only answer if they already knew the material.
+3. Teach before you ask, one key point at a time. Each step lists its key points in order, marked taught, next or later; a message teaches only the one marked next, never the whole step, and does not list or preview the others. Explain it in a few short sentences: start from something the student already knows or an everyday example, then bring in the idea from the source passages. Then ask the student to use that point, for example by applying it to an everyday situation or by predicting what would happen without it, not to repeat what you said. Never ask about something you have not taught yet. If the teacher asks for a Socratic style, explain less and let the student work out more through guiding questions, but still give them something to reason from first: never open with a question they could only answer if they already knew the material.
 4. Judge the student's latest message before you reply:
    - correct: say specifically what was right, then go one level deeper or move on.
    - partial: name the correct part, then ask about the missing part.
    - incorrect (a wrong answer): never give the answer away. Find the likely misunderstanding and give one hint or a simpler question. A hint points toward the idea without naming the parts of the answer the student has not found yet, or where they come from. Check your hint: if the student could answer by repeating words from it, it is too strong. Each new attempt gets a stronger hint.
    - question: answer it briefly from the source passages, then return to the step.
    - off_topic: kindly bring the student back to the lesson.
-5. When the student says they do not know, asks you to explain, or just writes something like "continue", they need more teaching, not the same question again. Explain the key point you are on in simpler words or with a different everyday example (the first one, if you have not taught anything yet), then ask an easier question about it. In a Socratic lesson, explain only the piece they are missing and let them work out the rest. If the student asks you to just tell them the answer to something you have already taught, give a stronger hint instead, unless the teacher's instructions say otherwise.
+5. When the student says they do not know, asks you to explain, or just writes something like "continue", they need more teaching, not the same question again. Explain the key point you are on (the last one you taught, or the one marked next if none is taught yet) in simpler words or with a different everyday example, then ask an easier question about it. In a Socratic lesson, explain only the piece they are missing and let them work out the rest. If the student asks you to just tell them the answer to something you have already taught, give a stronger hint instead, unless the teacher's instructions say otherwise.
 6. Stay grounded in the source passages: teach only what they say. Everyday examples and analogies are welcome to explain them, but do not add new facts. If the student asks about something the material does not cover, say so honestly, then come back to the lesson.
 7. A step is complete only when the student has shown, in their own words, that they reached its objective (usually by answering the check question correctly). Then confirm briefly and, in the same message, open the next step as rule 3 says. After the last step, end with a short recap of what the student learned and a warm closing line, with no new question.
 8. Watch the time budget. When time is nearly up, focus on the most important remaining idea and wrap up.
@@ -22,9 +22,10 @@ const TEACHING_RULES = `How to teach:
 
 const REPLY_FORMAT = `Reply format:
 Start every reply with one status line, then a blank line, then your message to the student:
-<turn>{"assessment":"none","stepComplete":false,"sources":["P1"]}</turn>
+<turn>{"assessment":"none","stepComplete":false,"keyPoint":1,"sources":["P1"]}</turn>
 - "assessment": your judgment of the student's latest message: "correct", "partial", "incorrect" (also for "I don't know" and other non-answers), "question", "off_topic", or "none" when there is nothing to judge (such as the start of the lesson).
 - "stepComplete": true only if the current step is complete with this reply.
+- "keyPoint": the number of the key point your message teaches (of the next step if you complete this one and open the next), or 0 if it teaches none, for example when you only check or recap.
 - "sources": the ids of the source passages your message is based on.
 The student never sees the status line. Never mention it.`;
 
@@ -33,7 +34,7 @@ The student never sees the status line. Never mention it.`;
  * is and how it is going. The chat history alone is never the source of truth.
  */
 export function buildTutorInstructions({ teacherPrompt, plan, progress, isStart }) {
-  const { stepIndex, attempts, minutesElapsed } = progress;
+  const { stepIndex, attempts, taught = 0, minutesElapsed } = progress;
   const step = plan.steps[stepIndex];
   const nextStep = plan.steps[stepIndex + 1];
 
@@ -55,7 +56,7 @@ export function buildTutorInstructions({ teacherPrompt, plan, progress, isStart 
         (s, i) => `${i + 1}. [${stepStatus(i, stepIndex)}] ${s.title}: ${s.objective}`,
       ),
     ),
-    section('current_step', stepDetails(step, stepIndex, attempts)),
+    section('current_step', stepDetails(step, stepIndex, attempts, taught)),
     nextStep
       ? section('next_step', stepDetails(nextStep, stepIndex + 1))
       : 'This is the last step. When it is complete, close the lesson.',
@@ -70,17 +71,25 @@ export function buildTutorInstructions({ teacherPrompt, plan, progress, isStart 
   ].join('\n\n');
 }
 
-function stepDetails(step, index, attempts) {
+function stepDetails(step, index, attempts, taught = 0) {
   return [
     `Step ${index + 1}: ${step.title}`,
     `Objective: ${step.objective}`,
-    `Key points: ${step.keyPoints.join(' | ')}`,
+    'Key points, taught in order:',
+    ...step.keyPoints.map((point, i) => `${i + 1}. [${keyPointStatus(i, taught)}] ${point}`),
+    taught >= step.keyPoints.length &&
+      'Every key point is taught: check the objective with the check question.',
     `Source passages: ${step.passageIds.join(', ') || 'none'}`,
     `Check question idea: ${step.checkQuestion}`,
     attempts !== undefined && `Weak answers on this step so far: ${attempts}`,
     attempts >= STRUGGLE_ATTEMPTS &&
       'The student is struggling. Change strategy: explain the idea directly from the passages and make it concrete with one everyday example or comparison. Then ask an easier question the student answers in their own words, not by copying a word from your explanation.',
   ];
+}
+
+function keyPointStatus(index, taught) {
+  if (index < taught) return 'taught';
+  return index === taught ? 'next' : 'later';
 }
 
 function stepStatus(index, current) {

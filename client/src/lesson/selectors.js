@@ -42,6 +42,7 @@ export function turnRequest(lesson, studentMessage) {
     progress: {
       stepIndex: progress.stepIndex,
       attempts: progress.attempts[progress.stepIndex],
+      taught: progress.taught[progress.stepIndex],
       minutesElapsed: minutesElapsed(progress),
     },
     history: lesson.messages

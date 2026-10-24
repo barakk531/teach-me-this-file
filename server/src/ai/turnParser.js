@@ -66,6 +66,7 @@ function parseMeta(json) {
     return {
       assessment: ASSESSMENTS.has(raw.assessment) ? raw.assessment : 'none',
       stepComplete: raw.stepComplete === true,
+      keyPoint: Number.isInteger(raw.keyPoint) && raw.keyPoint > 0 ? raw.keyPoint : 0,
       sources: Array.isArray(raw.sources) ? raw.sources.filter((s) => typeof s === 'string') : [],
     };
   } catch {

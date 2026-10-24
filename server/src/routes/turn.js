@@ -67,6 +67,7 @@ export function parseTurnRequest(body) {
     progress: {
       stepIndex,
       attempts: Math.max(0, Number(progress.attempts) || 0),
+      taught: Math.max(0, Math.floor(Number(progress.taught) || 0)),
       minutesElapsed: Math.max(0, Math.round(Number(progress.minutesElapsed) || 0)),
     },
     history: messages,

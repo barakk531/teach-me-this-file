@@ -4,7 +4,7 @@ import { parseTurnRequest } from './turn.js';
 const validBody = (overrides = {}) => ({
   teacherPrompt: 'Teach this to 7th graders.',
   plan: { steps: [{ title: 'A' }, { title: 'B' }], passages: [] },
-  progress: { stepIndex: 1, attempts: 2, minutesElapsed: 4.6 },
+  progress: { stepIndex: 1, attempts: 2, taught: 1, minutesElapsed: 4.6 },
   history: [{ role: 'tutor', text: 'Hi! What do you know about water?' }],
   studentMessage: '  It boils  ',
   ...overrides,
@@ -14,7 +14,7 @@ describe('parseTurnRequest', () => {
   it('accepts a valid turn and cleans it', () => {
     const input = parseTurnRequest(validBody());
     expect(input.studentMessage).toBe('It boils');
-    expect(input.progress).toEqual({ stepIndex: 1, attempts: 2, minutesElapsed: 5 });
+    expect(input.progress).toEqual({ stepIndex: 1, attempts: 2, taught: 1, minutesElapsed: 5 });
   });
 
   it('allows a turn without a student message only at the start', () => {
