@@ -46,7 +46,7 @@ export const tutorScenarios = [
     },
     expect: { assessment: ['none'], stepComplete: false },
     rubric:
-      'The teacher did not ask for a Socratic style and the student knows nothing yet. PASS only if the reply greets the student briefly, then teaches a first idea in simple words with an everyday example or comparison (for example that plants make their own food), and ends with exactly one question about what it just explained, which the student can answer from that explanation and their own experience. FAIL if it opens with a question about something it has not taught yet, if it lectures through the whole step at once (every input, where each one enters, and the equation), or if it asks several questions.',
+      'The teacher did not ask for a Socratic style and the student knows nothing yet. PASS only if the reply greets the student briefly, then teaches a first idea in simple words with an everyday example or comparison (for example that plants make their own food), and ends with exactly one question about what it just explained, which the student can answer from that explanation and their own experience (asking for the reason, as in "..., and why?", is part of one question). FAIL if it opens with a question about something it has not taught yet, if it lectures through the whole step at once (every input, where each one enters, and the equation), or if it asks several questions.',
   },
   {
     id: 'says-continue',
