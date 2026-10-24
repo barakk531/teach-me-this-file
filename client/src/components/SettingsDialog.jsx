@@ -58,8 +58,9 @@ function SettingsForm({ saved, serverKey, onClose }) {
         </button>
       </div>
       <p className="mt-2 text-[15px] text-muted">
-        Lessons are generated with Google Gemini, so the app needs a Gemini API key. Getting one is
-        free and takes a minute:
+        {serverKey
+          ? 'This server has a Gemini key of its own, so adding yours is optional. To use your own key:'
+          : 'Lessons are generated with Google Gemini, so the app needs a Gemini API key. Getting one is free and takes a minute:'}
       </p>
       <ol className="mt-2 list-decimal space-y-1 ps-5 text-[15px]">
         <li>
@@ -85,11 +86,6 @@ function SettingsForm({ saved, serverKey, onClose }) {
         The key is sent to our server with each request, used for that request only, and never
         stored there.
       </p>
-      {serverKey && (
-        <p className="mt-2 text-[15px] text-muted">
-          This server also has a key of its own, so adding yours is optional.
-        </p>
-      )}
 
       <label htmlFor="api-key" className="mt-5 block font-medium">
         API key
