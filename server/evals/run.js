@@ -68,6 +68,9 @@ async function runTutorScenario({ input, expect, rubric }) {
   if (expect.stepComplete !== undefined && meta.stepComplete !== expect.stepComplete) {
     problems.push(`stepComplete was ${meta.stepComplete}, expected ${expect.stepComplete}`);
   }
+  if (expect.keyPoint && !expect.keyPoint.includes(meta.keyPoint)) {
+    problems.push(`keyPoint was ${meta.keyPoint}, expected ${expect.keyPoint.join(' or ')}`);
+  }
   const transcript = [
     ...input.history,
     ...(input.studentMessage ? [{ role: 'student', text: input.studentMessage }] : []),

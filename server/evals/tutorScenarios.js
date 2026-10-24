@@ -44,7 +44,7 @@ export const tutorScenarios = [
       studentMessage: null,
       progress: { ...base.progress, minutesElapsed: 0 },
     },
-    expect: { assessment: ['none'], stepComplete: false },
+    expect: { assessment: ['none'], stepComplete: false, keyPoint: [1] },
     rubric:
       'The teacher did not ask for a Socratic style and the student knows nothing yet. PASS only if the reply greets the student briefly, then teaches a first idea in simple words with an everyday example or comparison (for example that plants make their own food), and ends with exactly one question about what it just explained, which the student can answer from that explanation and their own experience (asking for the reason, as in "..., and why?", is part of one question). FAIL if it opens with a question about something it has not taught yet, if it lectures through the whole step at once (every input, where each one enters, and the equation), or if it asks several questions.',
   },
@@ -52,7 +52,7 @@ export const tutorScenarios = [
     id: 'says-continue',
     title: 'Student only writes "continue": explains more, not the same question',
     input: { ...base, teacherPrompt: PLAIN_PROMPT, studentMessage: 'continue' },
-    expect: { stepComplete: false },
+    expect: { stepComplete: false, keyPoint: [1] },
     rubric:
       'The tutor opened with a question, and the student, who has not been taught anything yet, wrote only "continue". PASS only if the tutor now explains something in simple words (for example that a plant makes its own food from things it takes in around it) and then asks one question that is easier than the opening question. FAIL if it asks the opening question again, only urges the student to try ("Give it a try!"), gives a hint without explaining anything, explains every ingredient at once, or asks two separate things (asking for the reason counts as one).',
   },
