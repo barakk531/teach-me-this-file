@@ -30,6 +30,12 @@ describe('toAppError', () => {
       expose: true,
     });
     expect(toAppError(badBody)).toMatchObject({ code: 'invalid_request', retryable: false });
+    // An unknown charset keeps its own status.
+    const badCharset = Object.assign(new Error('unsupported charset "KLINGON"'), {
+      status: 415,
+      expose: true,
+    });
+    expect(toAppError(badCharset)).toMatchObject({ code: 'invalid_request', status: 415 });
   });
 
   it('treats a dropped connection to the AI as the service being unreachable', () => {

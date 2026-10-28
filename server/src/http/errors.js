@@ -44,7 +44,9 @@ function classify(err) {
     return new AppError('request_too_large', 'The request is too large.', { status: 413 });
   }
   if (err?.expose && err.status >= 400 && err.status < 500) {
-    return new AppError('invalid_request', 'The request could not be read.');
+    return new AppError('invalid_request', 'The request could not be read.', {
+      status: err.status,
+    });
   }
   if (err instanceof multer.MulterError) {
     return err.code === 'LIMIT_FILE_SIZE'
