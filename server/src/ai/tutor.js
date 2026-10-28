@@ -44,7 +44,7 @@ export async function* runTutorTurn({
       if (!event.meta) console.warn('[tutor] reply had no valid status line; using defaults');
       meta = {
         type: 'meta',
-        data: checkMeta(event.meta, plan, progress.stepIndex, studentMessage),
+        data: checkMeta(event.meta, plan, progress, studentMessage),
         raw: event.meta,
       };
     } else {
@@ -95,18 +95,20 @@ function toTurn(message) {
 }
 
 /** Never trust the model's status line blindly: it drives the app's progress. */
-function checkMeta(meta, plan, stepIndex, studentMessage) {
+function checkMeta(meta, plan, { stepIndex, taught = 0 }, studentMessage) {
   const known = new Set(plan.passages.map((p) => p.id));
   const sources = (meta?.sources ?? []).filter((id) => known.has(id));
   // A step can only be completed by something the student said.
   const stepComplete = Boolean(studentMessage && meta?.stepComplete);
-  // A reply that completes a step also opens the next one, so its key point belongs there.
+  // Key points are taught in order, so a reply can introduce the next one at most. A reply
+  // that completes a step also opens the next one, so its key point is that step's first.
   const keyPoints = plan.steps[stepComplete ? stepIndex + 1 : stepIndex]?.keyPoints ?? [];
+  const latest = Math.min(stepComplete ? 1 : taught + 1, keyPoints.length);
   const keyPoint = meta?.keyPoint ?? 0;
   return {
     assessment: studentMessage ? (meta?.assessment ?? 'none') : 'none',
     stepComplete,
-    keyPoint: keyPoint <= keyPoints.length ? keyPoint : 0,
+    keyPoint: keyPoint <= latest ? keyPoint : 0,
     sources: sources.length > 0 ? sources : (plan.steps[stepIndex]?.passageIds ?? []),
   };
 }

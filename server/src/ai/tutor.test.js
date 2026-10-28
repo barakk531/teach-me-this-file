@@ -99,12 +99,12 @@ describe('buildTutorInstructions', () => {
 });
 
 describe('runTutorTurn', () => {
-  const turn = () =>
+  const turn = (progress) =>
     runTutorTurn({
       apiKey: 'test',
       teacherPrompt: 'Be Socratic.',
       plan,
-      progress: { stepIndex: 0, attempts: 0, minutesElapsed: 1 },
+      progress: { stepIndex: 0, attempts: 0, minutesElapsed: 1, ...progress },
       history: [{ role: 'tutor', text: 'What do plants need?' }],
       studentMessage: 'Soil?',
     });
@@ -129,16 +129,24 @@ describe('runTutorTurn', () => {
     });
   });
 
-  it('keeps only key points that exist, on the step the reply ends on', async () => {
-    const metaOf = async (status) => {
+  it('keeps a key point only if it is the next one or one already taught', async () => {
+    const metaOf = async (status, progress) => {
       replyWith(`<turn>${status}</turn>`, 'Reply.');
-      for await (const event of turn()) if (event.type === 'meta') return event.data;
+      for await (const event of turn(progress)) if (event.type === 'meta') return event.data;
     };
-    expect(await metaOf('{"assessment":"none","keyPoint":2}')).toMatchObject({ keyPoint: 2 });
-    expect(await metaOf('{"assessment":"none","keyPoint":3}')).toMatchObject({ keyPoint: 0 });
-    // Completing step 1 opens step 2, whose key points are counted instead.
-    const opened = '{"assessment":"correct","stepComplete":true,"keyPoint":2}';
-    expect(await metaOf(opened)).toMatchObject({ stepComplete: true, keyPoint: 2 });
+    const point = (n) => `{"assessment":"none","keyPoint":${n}}`;
+    expect(await metaOf(point(2), { taught: 1 })).toMatchObject({ keyPoint: 2 });
+    expect(await metaOf(point(1), { taught: 2 })).toMatchObject({ keyPoint: 1 });
+    // Skipping a point that was never taught, or one the step does not have.
+    expect(await metaOf(point(2), { taught: 0 })).toMatchObject({ keyPoint: 0 });
+    expect(await metaOf(point(3), { taught: 2 })).toMatchObject({ keyPoint: 0 });
+    // Completing step 1 opens step 2, so the point must be step 2's first.
+    const opened = (n) => `{"assessment":"correct","stepComplete":true,"keyPoint":${n}}`;
+    expect(await metaOf(opened(1), { taught: 2 })).toMatchObject({
+      stepComplete: true,
+      keyPoint: 1,
+    });
+    expect(await metaOf(opened(2), { taught: 2 })).toMatchObject({ keyPoint: 0 });
   });
 
   it('turns an empty answer into a retryable failure, not an empty message', async () => {
