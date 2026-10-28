@@ -94,7 +94,10 @@ function finishTurn(state, id, stopped) {
   if (stopped && !message.text) return lessonReducer(state, { type: 'tutorMessageRemoved', id });
 
   const finished = updateMessage(state, id, () => ({ status: stopped ? 'stopped' : 'done' }));
-  return message.meta ? applyAssessment(finished, message.meta) : finished;
+  if (!message.meta) return finished;
+  // The judgment of the student's answer stands, but a reply stopped part-way may have
+  // been cut off before its explanation, so its key point does not count as taught.
+  return applyAssessment(finished, stopped ? { ...message.meta, keyPoint: 0 } : message.meta);
 }
 
 function applyAssessment(state, meta) {

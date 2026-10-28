@@ -115,6 +115,17 @@ describe('lessonReducer', () => {
     expect(empty.messages).toHaveLength(0);
   });
 
+  it('does not count the key point of a stopped reply as taught', () => {
+    const lesson = run([
+      created,
+      ...tutorTurn('t1', meta('none', false, 1)),
+      say('s1', 'Light'),
+      // Stopped after "Great!", before the explanation of point 2 arrived.
+      ...tutorTurn('t2', meta('correct', false, 2), { text: 'Great!', end: 'stopped' }),
+    ]);
+    expect(lesson.progress.taught).toEqual([1, 0]);
+  });
+
   it('replaces a failed reply when the student writes again', () => {
     const lesson = run([
       created,
