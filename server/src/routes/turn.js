@@ -36,9 +36,7 @@ turnRouter.post('/', express.json({ limit: '1mb' }), requireApiKey, async (req, 
  */
 export function parseTurnRequest(body) {
   const { teacherPrompt, plan, progress, history, studentMessage } = body ?? {};
-  if (!Array.isArray(plan?.steps) || !Array.isArray(plan?.passages) || plan.steps.length === 0) {
-    throw invalid('The lesson plan is missing.');
-  }
+  if (!isPlan(plan)) throw invalid('The lesson plan is missing or incomplete.');
   if (
     typeof teacherPrompt !== 'string' ||
     teacherPrompt.length > config.limits.teacherPromptChars
@@ -73,6 +71,17 @@ export function parseTurnRequest(body) {
     history: messages,
     studentMessage: message,
   };
+}
+
+/** The lists the tutor prompt is built from, so a damaged plan fails here and not mid-turn. */
+function isPlan(plan) {
+  return (
+    Array.isArray(plan?.steps) &&
+    plan.steps.length > 0 &&
+    plan.steps.every((s) => Array.isArray(s?.keyPoints) && Array.isArray(s?.passageIds)) &&
+    Array.isArray(plan.passages) &&
+    plan.passages.every((p) => typeof p?.id === 'string')
+  );
 }
 
 function invalid(message) {
