@@ -38,11 +38,12 @@ export function isNetworkError(err) {
 
 function classify(err) {
   if (err?.name === 'AbortError') return new AppError('aborted', 'The request was cancelled.');
-  // Errors from express.json(): the client's fault, not a server failure.
+  // Errors from express.json(): the client's fault, not a server failure. Each one is
+  // marked "expose" with a 4xx status (broken JSON, a bad gzip body, an unknown charset).
   if (err?.type === 'entity.too.large') {
     return new AppError('request_too_large', 'The request is too large.', { status: 413 });
   }
-  if (err?.type === 'entity.parse.failed') {
+  if (err?.expose && err.status >= 400 && err.status < 500) {
     return new AppError('invalid_request', 'The request could not be read.');
   }
   if (err instanceof multer.MulterError) {

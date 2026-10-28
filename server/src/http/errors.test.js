@@ -23,6 +23,15 @@ describe('toAppError', () => {
     expect(toAppError(new ApiError({ status: 503, message: 'Overloaded' })).retryable).toBe(true);
   });
 
+  it('treats a request body the server cannot read as a client error', () => {
+    // What express.json() raises for a gzip body with bytes after the end of the stream.
+    const badBody = Object.assign(new Error('incorrect header check'), {
+      status: 400,
+      expose: true,
+    });
+    expect(toAppError(badBody)).toMatchObject({ code: 'invalid_request', retryable: false });
+  });
+
   it('treats a dropped connection to the AI as the service being unreachable', () => {
     expect(toAppError(new TypeError('fetch failed'))).toMatchObject({
       code: 'ai_unavailable',
