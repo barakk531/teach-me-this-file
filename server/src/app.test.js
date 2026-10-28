@@ -48,6 +48,24 @@ describe('app', () => {
     expect((await res.json()).error.code).toBe('invalid_request');
   });
 
+  it('answers a broken upload form with a 400, not a server error', async () => {
+    const headers = { 'X-Gemini-Key': 'test' };
+    const cutOff = await fetch(`${baseUrl}/api/plan`, {
+      method: 'POST',
+      headers: { ...headers, 'Content-Type': 'multipart/form-data; boundary=B' },
+      body: '--B\r\nContent-Disposition: form-data; name="file"; filename="a.txt"\r\n\r\nhal',
+    });
+    expect(cutOff.status).toBe(400);
+    expect((await cutOff.json()).error.code).toBe('invalid_request');
+
+    const noBoundary = await fetch(`${baseUrl}/api/plan`, {
+      method: 'POST',
+      headers: { ...headers, 'Content-Type': 'multipart/form-data' },
+      body: 'abc',
+    });
+    expect(noBoundary.status).toBe(400);
+  });
+
   it('answers unknown API routes with a JSON 404', async () => {
     const res = await fetch(`${baseUrl}/api/unknown`, { method: 'POST' });
     expect(res.status).toBe(404);

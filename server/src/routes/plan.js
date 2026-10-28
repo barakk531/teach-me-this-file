@@ -13,10 +13,24 @@ const upload = multer({
   limits: { fileSize: config.limits.uploadBytes, files: 1, fields: 2, fieldSize: 16 * 1024 },
 });
 
+/**
+ * Multer reads the form with busboy, which rejects a broken form (cut off, without a
+ * boundary, a malformed part) with a plain Error. That is the client's fault, so it is
+ * marked the way express.json() marks a body it cannot read.
+ */
+function readForm(req, res, next) {
+  upload.single('file')(req, res, (err) => {
+    if (err && !(err instanceof multer.MulterError)) {
+      Object.assign(err, { status: 400, expose: true });
+    }
+    next(err);
+  });
+}
+
 export const planRouter = Router();
 
 // The key is checked before the upload is read, so a missing key fails fast.
-planRouter.post('/', requireApiKey, upload.single('file'), async (req, res, next) => {
+planRouter.post('/', requireApiKey, readForm, async (req, res, next) => {
   const teacherPrompt = req.body?.prompt?.trim() ?? '';
   if (!req.file) return next(new AppError('missing_file', 'Choose a file to teach from.'));
   if (!teacherPrompt)
